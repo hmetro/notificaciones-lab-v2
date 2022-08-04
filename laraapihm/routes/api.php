@@ -1,8 +1,10 @@
 <?php
 
 use Illuminate\Http\Request;
+use Viewflex\Zoap\ZoapController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\PedidoLaboratorioController;
+use App\Http\Controllers\API\SoapController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,3 +27,13 @@ Route::middleware(['xml'])->group(function () {
 
 });
 
+Route::get('zoap/{key}/server', [
+    'as' => 'zoap.server.wsdl',
+    'uses' => 'Viewflex\Zoap\ZoapController@server',
+]);
+
+
+Route::post('zoap/{key}/server', [
+    'as' => 'zoap.server',
+    'uses' => 'Viewflex\Zoap\ZoapController@server',
+]);
