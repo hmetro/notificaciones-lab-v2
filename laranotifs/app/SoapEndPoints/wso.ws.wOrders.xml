@@ -1,0 +1,749 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:s0="http://tempuri.org" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" targetNamespace="http://tempuri.org">
+    <types>
+        <s:schema elementFormDefault="qualified" targetNamespace="http://tempuri.org">
+            <s:element name="GetList">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" name="pstrSessionKey" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrSampleID" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrRegisterDate" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrRegisterHour" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrRegisterYear" type="s:string"/>
+                        <s:element minOccurs="0" name="pintStatus" type="s:long"/>
+                        <s:element minOccurs="0" name="pstrDestination" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrOrigin" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrPatientID1" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrPatientID2" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrPatientID3" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrFirstName" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrLastName" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrSeconSurname" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrSurNameAndName" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrSex" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrSuperGroupName" type="s:string"/>
+                        <s:element minOccurs="0" name="pintGroupID" type="s:long"/>
+                        <s:element minOccurs="0" name="pstrRegisterDateFrom" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrRegisterDateTo" type="s:string"/>
+                        <s:element minOccurs="0" name="plstSpecimenList" type="s0:ArrayOfplstSpecimenListItemString"/>
+                        <s:element minOccurs="0" name="pstrUse" type="s:string"/>
+                        <s:element minOccurs="0" name="plstTestsIDs" type="s0:ArrayOfplstTestsIDsItemString"/>
+                        <s:element minOccurs="0" name="plstGroupsIDs" type="s0:ArrayOfplstGroupsIDsItemString"/>
+                        <s:element minOccurs="0" name="pstrDoctorID" type="s:string"/>
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:complexType name="ArrayOfplstSpecimenListItemString">
+                <s:sequence>
+                    <s:element maxOccurs="unbounded" minOccurs="0" name="plstSpecimenListItem" nillable="true" type="s:string"/>
+                </s:sequence>
+            </s:complexType>
+            <s:complexType name="ArrayOfplstTestsIDsItemString">
+                <s:sequence>
+                    <s:element maxOccurs="unbounded" minOccurs="0" name="plstTestsIDsItem" nillable="true" type="s:string"/>
+                </s:sequence>
+            </s:complexType>
+            <s:complexType name="ArrayOfplstGroupsIDsItemString">
+                <s:sequence>
+                    <s:element maxOccurs="unbounded" minOccurs="0" name="plstGroupsIDsItem" nillable="true" type="s:string"/>
+                </s:sequence>
+            </s:complexType>
+            <s:element name="GetListResponse">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element name="GetListResult" type="s0:DataSet"/>
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:complexType name="DataSet">
+                <s:sequence>
+                    <s:element ref="s:schema"/>
+                    <s:any/>
+                </s:sequence>
+            </s:complexType>
+            <s:element name="GetListByDemographic">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" name="pstrSessionKey" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrSampleID" type="s:string"/>
+                        <s:element minOccurs="0" name="pintStatus" type="s:long"/>
+                        <s:element minOccurs="0" name="pstrPatientID1" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrPatientID2" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrPatientID3" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrSuperGroupName" type="s:string"/>
+                        <s:element minOccurs="0" name="pintGroupID" type="s:long"/>
+                        <s:element minOccurs="0" name="pstrRegisterDateFrom" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrRegisterDateTo" type="s:string"/>
+                        <s:element minOccurs="0" name="plstSpecimenList" type="s0:ArrayOfplstSpecimenListItemString"/>
+                        <s:element minOccurs="0" name="plstTestsIDs" type="s0:ArrayOfplstTestsIDsItemString"/>
+                        <s:element minOccurs="0" name="plstGroupsIDs" type="s0:ArrayOfplstGroupsIDsItemString"/>
+                        <s:element minOccurs="0" name="plstDemographics" type="s0:ArrayOfDemographicDemographic"/>
+                        <s:element minOccurs="0" name="pblnDBImport" type="s:boolean"/>
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:complexType name="ArrayOfDemographicDemographic">
+                <s:sequence>
+                    <s:element maxOccurs="unbounded" minOccurs="0" name="Demographic" nillable="true" type="s0:Demographic"/>
+                </s:sequence>
+            </s:complexType>
+            <s:complexType name="Demographic">
+                <s:sequence>
+                    <s:element minOccurs="0" name="InternalDemographicID" type="s:long"/>
+                    <s:element minOccurs="0" name="DemographicCode" type="s:string"/>
+                    <s:element minOccurs="0" name="DemographicName">
+                        <s:simpleType>
+                            <s:restriction base="s:string">
+                                <s:maxLength value="12"/>
+                            </s:restriction>
+                        </s:simpleType>
+                    </s:element>
+                    <s:element minOccurs="0" name="DemographicUse" type="s:string"/>
+                    <s:element minOccurs="0" name="Mandatory" type="s:long"/>
+                    <s:element minOccurs="0" name="DisplayOrder" type="s:long"/>
+                    <s:element minOccurs="0" name="DemographicType" type="s:long"/>
+                    <s:element minOccurs="0" name="DemographicCurrentValue">
+                        <s:simpleType>
+                            <s:restriction base="s:string">
+                                <s:maxLength value="255"/>
+                            </s:restriction>
+                        </s:simpleType>
+                    </s:element>
+                    <s:element minOccurs="0" name="DemographicCurrentCode" type="s:string"/>
+                </s:sequence>
+            </s:complexType>
+            <s:element name="GetListByDemographicResponse">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element name="GetListByDemographicResult" type="s0:DataSet"/>
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="GetListOrdersByPatient">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" name="pstrSessionKey" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrPatientID1" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrDateFrom" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrDateTo" type="s:string"/>
+                        <s:element minOccurs="0" name="pintIdReport" type="s:long"/>
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="GetListOrdersByPatientResponse">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element name="GetListOrdersByPatientResult" type="s0:ArrayOfOrderDataOrderData"/>
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:complexType name="ArrayOfOrderDataOrderData">
+                <s:sequence>
+                    <s:element maxOccurs="unbounded" minOccurs="0" name="OrderData" nillable="true" type="s0:OrderData"/>
+                </s:sequence>
+            </s:complexType>
+            <s:complexType name="OrderData">
+                <s:sequence>
+                    <s:element name="InternalOrderID">
+                        <s:simpleType>
+                            <s:restriction base="s:string">
+                                <s:maxLength value="20"/>
+                            </s:restriction>
+                        </s:simpleType>
+                    </s:element>
+                    <s:element name="SampleID">
+                        <s:simpleType>
+                            <s:restriction base="s:string">
+                                <s:maxLength value="20"/>
+                            </s:restriction>
+                        </s:simpleType>
+                    </s:element>
+                    <s:element name="RegisterDate">
+                        <s:simpleType>
+                            <s:restriction base="s:string">
+                                <s:maxLength value="100"/>
+                            </s:restriction>
+                        </s:simpleType>
+                    </s:element>
+                    <s:element minOccurs="0" name="RegisterHour">
+                        <s:simpleType>
+                            <s:restriction base="s:string">
+                                <s:maxLength value="100"/>
+                            </s:restriction>
+                        </s:simpleType>
+                    </s:element>
+                    <s:element minOccurs="0" name="RegisterYear">
+                        <s:simpleType>
+                            <s:restriction base="s:string">
+                                <s:maxLength value="100"/>
+                            </s:restriction>
+                        </s:simpleType>
+                    </s:element>
+                    <s:element name="OrderUse" type="s:string"/>
+                    <s:element minOccurs="0" name="InternalCommentID" type="s:string"/>
+                    <s:element minOccurs="0" name="TextComment">
+                        <s:simpleType>
+                            <s:restriction base="s:string">
+                                <s:maxLength value="32000"/>
+                            </s:restriction>
+                        </s:simpleType>
+                    </s:element>
+                    <s:element name="Status" type="s:long"/>
+                    <s:element minOccurs="0" name="Patient" type="s0:Patient"/>
+                    <s:element minOccurs="0" name="Demographics" type="s0:ArrayOfDemographicDemographic"/>
+                    <s:element minOccurs="0" name="TestsList" type="s0:ArrayOfTestTest"/>
+                    <s:element minOccurs="0" name="NewOrderAvailable" type="s:long"/>
+                    <s:element name="OrderTS" type="s0:TimeStamping"/>
+                    <s:element minOccurs="0" name="ReportPath" type="s:string"/>
+                    <s:element minOccurs="0" name="GroupList" type="s0:ArrayOfGroupGroup"/>
+                </s:sequence>
+            </s:complexType>
+            <s:complexType name="Patient">
+                <s:sequence>
+                    <s:element name="InternalPatientID" type="s:long"/>
+                    <s:element name="PatientID1">
+                        <s:simpleType>
+                            <s:restriction base="s:string">
+                                <s:maxLength value="30"/>
+                            </s:restriction>
+                        </s:simpleType>
+                    </s:element>
+                    <s:element minOccurs="0" name="PatientID2">
+                        <s:simpleType>
+                            <s:restriction base="s:string">
+                                <s:maxLength value="30"/>
+                            </s:restriction>
+                        </s:simpleType>
+                    </s:element>
+                    <s:element minOccurs="0" name="PatientID3">
+                        <s:simpleType>
+                            <s:restriction base="s:string">
+                                <s:maxLength value="30"/>
+                            </s:restriction>
+                        </s:simpleType>
+                    </s:element>
+                    <s:element minOccurs="0" name="FirstName">
+                        <s:simpleType>
+                            <s:restriction base="s:string">
+                                <s:maxLength value="80"/>
+                            </s:restriction>
+                        </s:simpleType>
+                    </s:element>
+                    <s:element minOccurs="0" name="LastName">
+                        <s:simpleType>
+                            <s:restriction base="s:string">
+                                <s:maxLength value="80"/>
+                            </s:restriction>
+                        </s:simpleType>
+                    </s:element>
+                    <s:element minOccurs="0" name="SurNameAndName">
+                        <s:simpleType>
+                            <s:restriction base="s:string">
+                                <s:maxLength value="80"/>
+                            </s:restriction>
+                        </s:simpleType>
+                    </s:element>
+                    <s:element minOccurs="0" name="DateOfBirth" type="s:string"/>
+                    <s:element minOccurs="0" name="Sex">
+                        <s:simpleType>
+                            <s:restriction base="s:string">
+                                <s:maxLength value="20"/>
+                            </s:restriction>
+                        </s:simpleType>
+                    </s:element>
+                </s:sequence>
+            </s:complexType>
+            <s:complexType name="ArrayOfTestTest">
+                <s:sequence>
+                    <s:element maxOccurs="unbounded" minOccurs="0" name="Test" nillable="true" type="s0:Test"/>
+                </s:sequence>
+            </s:complexType>
+            <s:complexType name="Test">
+                <s:sequence>
+                    <s:element name="TestID">
+                        <s:simpleType>
+                            <s:restriction base="s:string">
+                                <s:maxLength value="20"/>
+                            </s:restriction>
+                        </s:simpleType>
+                    </s:element>
+                    <s:element name="TestAbbreviation">
+                        <s:simpleType>
+                            <s:restriction base="s:string">
+                                <s:maxLength value="8"/>
+                            </s:restriction>
+                        </s:simpleType>
+                    </s:element>
+                    <s:element name="TestName">
+                        <s:simpleType>
+                            <s:restriction base="s:string">
+                                <s:maxLength value="50"/>
+                            </s:restriction>
+                        </s:simpleType>
+                    </s:element>
+                    <s:element name="SpecimenID">
+                        <s:simpleType>
+                            <s:restriction base="s:string">
+                                <s:maxLength value="30"/>
+                            </s:restriction>
+                        </s:simpleType>
+                    </s:element>
+                    <s:element minOccurs="0" name="SpecimenName">
+                        <s:simpleType>
+                            <s:restriction base="s:string">
+                                <s:maxLength value="30"/>
+                            </s:restriction>
+                        </s:simpleType>
+                    </s:element>
+                    <s:element minOccurs="0" name="HasComment" type="s:boolean"/>
+                    <s:element minOccurs="0" name="CommentList" type="s0:ArrayOfCommentComment"/>
+                    <s:element minOccurs="0" name="PanicLow" type="s:decimal"/>
+                    <s:element minOccurs="0" name="Low" type="s:decimal"/>
+                    <s:element minOccurs="0" name="High" type="s:decimal"/>
+                    <s:element minOccurs="0" name="PanicHigh" type="s:decimal"/>
+                    <s:element minOccurs="0" name="ValueResult">
+                        <s:simpleType>
+                            <s:restriction base="s:string">
+                                <s:maxLength value="11"/>
+                            </s:restriction>
+                        </s:simpleType>
+                    </s:element>
+                    <s:element minOccurs="0" name="ValueResultDate" type="s:date"/>
+                    <s:element minOccurs="0" name="ValueResultHour" type="s:time"/>
+                    <s:element minOccurs="0" name="ResultID">
+                        <s:simpleType>
+                            <s:restriction base="s:string">
+                                <s:maxLength value="11"/>
+                            </s:restriction>
+                        </s:simpleType>
+                    </s:element>
+                    <s:element name="Alarms">
+                        <s:simpleType>
+                            <s:restriction base="s:string">
+                                <s:maxLength value="125"/>
+                            </s:restriction>
+                        </s:simpleType>
+                    </s:element>
+                    <s:element minOccurs="0" name="PrimaryUnit" type="s:string"/>
+                    <s:element minOccurs="0" name="HasResult" type="s:boolean"/>
+                    <s:element minOccurs="0" name="RegisterDate" type="s:date"/>
+                    <s:element minOccurs="0" name="ValStatus" type="s:long"/>
+                    <s:element minOccurs="0" name="ValDate" type="s:date"/>
+                    <s:element minOccurs="0" name="ValHour" type="s:time"/>
+                    <s:element minOccurs="0" name="ValUser">
+                        <s:simpleType>
+                            <s:restriction base="s:string">
+                                <s:maxLength value="16"/>
+                            </s:restriction>
+                        </s:simpleType>
+                    </s:element>
+                    <s:element minOccurs="0" name="AutomaticTecnicVal" type="s:long"/>
+                    <s:element minOccurs="0" name="ClinicStatus" type="s:long"/>
+                    <s:element minOccurs="0" name="ClinicDate" type="s:date"/>
+                    <s:element minOccurs="0" name="ClinicHour" type="s:time"/>
+                    <s:element minOccurs="0" name="ClinicUser">
+                        <s:simpleType>
+                            <s:restriction base="s:string">
+                                <s:maxLength value="16"/>
+                            </s:restriction>
+                        </s:simpleType>
+                    </s:element>
+                    <s:element minOccurs="0" name="AutomaticClinicVal" type="s:long"/>
+                    <s:element minOccurs="0" name="InfStatus" type="s:boolean"/>
+                    <s:element minOccurs="0" name="InfDate" type="s:date"/>
+                    <s:element minOccurs="0" name="InfHour" type="s:time"/>
+                    <s:element minOccurs="0" name="InfUser">
+                        <s:simpleType>
+                            <s:restriction base="s:string">
+                                <s:maxLength value="16"/>
+                            </s:restriction>
+                        </s:simpleType>
+                    </s:element>
+                    <s:element minOccurs="0" name="HostStatus">
+                        <s:simpleType>
+                            <s:restriction base="s:long">
+                                <s:maxInclusive value="3"/>
+                            </s:restriction>
+                        </s:simpleType>
+                    </s:element>
+                    <s:element minOccurs="0" name="HostDate" type="s:date"/>
+                    <s:element minOccurs="0" name="HostHour" type="s:time"/>
+                    <s:element minOccurs="0" name="HostUser">
+                        <s:simpleType>
+                            <s:restriction base="s:string">
+                                <s:maxLength value="16"/>
+                            </s:restriction>
+                        </s:simpleType>
+                    </s:element>
+                    <s:element minOccurs="0" name="MicroType" type="s:long"/>
+                </s:sequence>
+            </s:complexType>
+            <s:complexType name="ArrayOfCommentComment">
+                <s:sequence>
+                    <s:element maxOccurs="unbounded" minOccurs="0" name="Comment" nillable="true" type="s0:Comment"/>
+                </s:sequence>
+            </s:complexType>
+            <s:complexType name="Comment">
+                <s:sequence>
+                    <s:element minOccurs="0" name="InternalCommentID" type="s:string"/>
+                    <s:element minOccurs="0" name="TextComment">
+                        <s:simpleType>
+                            <s:restriction base="s:string">
+                                <s:maxLength value="32000"/>
+                            </s:restriction>
+                        </s:simpleType>
+                    </s:element>
+                </s:sequence>
+            </s:complexType>
+            <s:complexType name="TimeStamping">
+                <s:sequence>
+                    <s:element minOccurs="0" name="TSUser">
+                        <s:simpleType>
+                            <s:restriction base="s:string">
+                                <s:maxLength value="250"/>
+                            </s:restriction>
+                        </s:simpleType>
+                    </s:element>
+                    <s:element minOccurs="0" name="TSDateTime">
+                        <s:simpleType>
+                            <s:restriction base="s:string">
+                                <s:maxLength value="14"/>
+                            </s:restriction>
+                        </s:simpleType>
+                    </s:element>
+                </s:sequence>
+            </s:complexType>
+            <s:complexType name="ArrayOfGroupGroup">
+                <s:sequence>
+                    <s:element maxOccurs="unbounded" minOccurs="0" name="Group" nillable="true" type="s0:Group"/>
+                </s:sequence>
+            </s:complexType>
+            <s:complexType name="Group">
+                <s:sequence>
+                    <s:element minOccurs="0" name="TestList" type="s0:ArrayOfTestTest"/>
+                    <s:element name="GroupID">
+                        <s:simpleType>
+                            <s:restriction base="s:string">
+                                <s:maxLength value="20"/>
+                            </s:restriction>
+                        </s:simpleType>
+                    </s:element>
+                    <s:element name="GroupName">
+                        <s:simpleType>
+                            <s:restriction base="s:string">
+                                <s:maxLength value="50"/>
+                            </s:restriction>
+                        </s:simpleType>
+                    </s:element>
+                    <s:element minOccurs="0" name="SuperGroupID">
+                        <s:simpleType>
+                            <s:restriction base="s:string">
+                                <s:maxLength value="20"/>
+                            </s:restriction>
+                        </s:simpleType>
+                    </s:element>
+                    <s:element minOccurs="0" name="SuperGroupName">
+                        <s:simpleType>
+                            <s:restriction base="s:string">
+                                <s:maxLength value="50"/>
+                            </s:restriction>
+                        </s:simpleType>
+                    </s:element>
+                </s:sequence>
+            </s:complexType>
+            <s:element name="GetNextOrderID">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" name="pstrSessionKey" type="s:string"/>
+                        <s:element minOccurs="0" name="pintApplicationID" type="s:long"/>
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="GetNextOrderIDResponse">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element name="GetNextOrderIDResult" type="s0:IDReturn"/>
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:complexType name="IDReturn">
+                <s:sequence>
+                    <s:element minOccurs="0" name="ID" type="s:string"/>
+                    <s:element minOccurs="0" name="Value1" type="s:string"/>
+                    <s:element minOccurs="0" name="Value2" type="s:string"/>
+                    <s:element minOccurs="0" name="Value3" type="s:string"/>
+                    <s:element minOccurs="0" name="Value4" type="s:string"/>
+                    <s:element minOccurs="0" name="Value5" type="s:string"/>
+                    <s:element minOccurs="0" name="Value6" type="s:string"/>
+                    <s:element minOccurs="0" name="Value7" type="s:string"/>
+                    <s:element minOccurs="0" name="Value8" type="s:string"/>
+                    <s:element minOccurs="0" name="Value9" type="s:string"/>
+                    <s:element minOccurs="0" name="Value10" type="s:string"/>
+                    <s:element minOccurs="0" name="Warning" type="s:string"/>
+                </s:sequence>
+            </s:complexType>
+            <s:element name="GetOrderData">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" name="pstrSessionKey" type="s:string"/>
+                        <s:element minOccurs="0" name="pintOrderID" type="s:long"/>
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="GetOrderDataResponse">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element name="GetOrderDataResult" type="s0:OrderData"/>
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="GetStatus">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" name="pstrSessionKey" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrSampleID" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrRegisterDate" type="s:string"/>
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="GetStatusResponse">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element name="GetStatusResult" type="s:long"/>
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="GetUserDemographicID">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" name="pstrSessionKey" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrDemographicDesc" type="s:string"/>
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="GetUserDemographicIDResponse">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element name="GetUserDemographicIDResult" type="s:long"/>
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="SetDemographicValue">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" name="pstrSessionKey" type="s:string"/>
+                        <s:element minOccurs="0" name="pintOrderID" type="s:long"/>
+                        <s:element minOccurs="0" name="pstrOrderID" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrRegisterDate" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrDemographicID" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrDemographicValue" type="s:string"/>
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="SetDemographicValueResponse">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element name="SetDemographicValueResult" type="s:long"/>
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="UnLockAndDel">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" name="pstrSessionKey" type="s:string"/>
+                        <s:element minOccurs="0" name="pintInUseID" type="s:long"/>
+                        <s:element minOccurs="0" name="pintApplicationID" type="s:long"/>
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="UnLockAndDelResponse">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element name="UnLockAndDelResult" type="s:boolean"/>
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+        </s:schema>
+    </types>
+    <message name="GetListSoapIn">
+        <part name="parameters" element="s0:GetList"/>
+    </message>
+    <message name="GetListSoapOut">
+        <part name="parameters" element="s0:GetListResponse"/>
+    </message>
+    <message name="GetListByDemographicSoapIn">
+        <part name="parameters" element="s0:GetListByDemographic"/>
+    </message>
+    <message name="GetListByDemographicSoapOut">
+        <part name="parameters" element="s0:GetListByDemographicResponse"/>
+    </message>
+    <message name="GetListOrdersByPatientSoapIn">
+        <part name="parameters" element="s0:GetListOrdersByPatient"/>
+    </message>
+    <message name="GetListOrdersByPatientSoapOut">
+        <part name="parameters" element="s0:GetListOrdersByPatientResponse"/>
+    </message>
+    <message name="GetNextOrderIDSoapIn">
+        <part name="parameters" element="s0:GetNextOrderID"/>
+    </message>
+    <message name="GetNextOrderIDSoapOut">
+        <part name="parameters" element="s0:GetNextOrderIDResponse"/>
+    </message>
+    <message name="GetOrderDataSoapIn">
+        <part name="parameters" element="s0:GetOrderData"/>
+    </message>
+    <message name="GetOrderDataSoapOut">
+        <part name="parameters" element="s0:GetOrderDataResponse"/>
+    </message>
+    <message name="GetStatusSoapIn">
+        <part name="parameters" element="s0:GetStatus"/>
+    </message>
+    <message name="GetStatusSoapOut">
+        <part name="parameters" element="s0:GetStatusResponse"/>
+    </message>
+    <message name="GetUserDemographicIDSoapIn">
+        <part name="parameters" element="s0:GetUserDemographicID"/>
+    </message>
+    <message name="GetUserDemographicIDSoapOut">
+        <part name="parameters" element="s0:GetUserDemographicIDResponse"/>
+    </message>
+    <message name="SetDemographicValueSoapIn">
+        <part name="parameters" element="s0:SetDemographicValue"/>
+    </message>
+    <message name="SetDemographicValueSoapOut">
+        <part name="parameters" element="s0:SetDemographicValueResponse"/>
+    </message>
+    <message name="UnLockAndDelSoapIn">
+        <part name="parameters" element="s0:UnLockAndDel"/>
+    </message>
+    <message name="UnLockAndDelSoapOut">
+        <part name="parameters" element="s0:UnLockAndDelResponse"/>
+    </message>
+    <portType name="wOrdersSoap">
+        <operation name="GetList">
+            <input message="s0:GetListSoapIn"/>
+            <output message="s0:GetListSoapOut"/>
+        </operation>
+        <operation name="GetListByDemographic">
+            <input message="s0:GetListByDemographicSoapIn"/>
+            <output message="s0:GetListByDemographicSoapOut"/>
+        </operation>
+        <operation name="GetListOrdersByPatient">
+            <input message="s0:GetListOrdersByPatientSoapIn"/>
+            <output message="s0:GetListOrdersByPatientSoapOut"/>
+        </operation>
+        <operation name="GetNextOrderID">
+            <input message="s0:GetNextOrderIDSoapIn"/>
+            <output message="s0:GetNextOrderIDSoapOut"/>
+        </operation>
+        <operation name="GetOrderData">
+            <input message="s0:GetOrderDataSoapIn"/>
+            <output message="s0:GetOrderDataSoapOut"/>
+        </operation>
+        <operation name="GetStatus">
+            <input message="s0:GetStatusSoapIn"/>
+            <output message="s0:GetStatusSoapOut"/>
+        </operation>
+        <operation name="GetUserDemographicID">
+            <input message="s0:GetUserDemographicIDSoapIn"/>
+            <output message="s0:GetUserDemographicIDSoapOut"/>
+        </operation>
+        <operation name="SetDemographicValue">
+            <input message="s0:SetDemographicValueSoapIn"/>
+            <output message="s0:SetDemographicValueSoapOut"/>
+        </operation>
+        <operation name="UnLockAndDel">
+            <input message="s0:UnLockAndDelSoapIn"/>
+            <output message="s0:UnLockAndDelSoapOut"/>
+        </operation>
+    </portType>
+    <binding name="wOrdersSoap" type="s0:wOrdersSoap">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <operation name="GetList">
+            <soap:operation soapAction="http://tempuri.org/wso.ws.wOrders.GetList" style="document"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="GetListByDemographic">
+            <soap:operation soapAction="http://tempuri.org/wso.ws.wOrders.GetListByDemographic" style="document"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="GetListOrdersByPatient">
+            <soap:operation soapAction="http://tempuri.org/wso.ws.wOrders.GetListOrdersByPatient" style="document"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="GetNextOrderID">
+            <soap:operation soapAction="http://tempuri.org/wso.ws.wOrders.GetNextOrderID" style="document"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="GetOrderData">
+            <soap:operation soapAction="http://tempuri.org/wso.ws.wOrders.GetOrderData" style="document"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="GetStatus">
+            <soap:operation soapAction="http://tempuri.org/wso.ws.wOrders.GetStatus" style="document"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="GetUserDemographicID">
+            <soap:operation soapAction="http://tempuri.org/wso.ws.wOrders.GetUserDemographicID" style="document"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="SetDemographicValue">
+            <soap:operation soapAction="http://tempuri.org/wso.ws.wOrders.SetDemographicValue" style="document"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="UnLockAndDel">
+            <soap:operation soapAction="http://tempuri.org/wso.ws.wOrders.UnLockAndDel" style="document"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+    </binding>
+    <service name="wOrders">
+        <port name="wOrdersSoap" binding="s0:wOrdersSoap">
+            <soap:address location="http://172.16.2.221/csp/acb/wso.ws.wOrders.cls"/>
+        </port>
+    </service>
+</definitions>

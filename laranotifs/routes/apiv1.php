@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ApiV1\ApiV1Controller;
+use App\Http\Controllers\ApiV1\OrdenesController;
 use App\Http\Controllers\ApiV1\ReglasNegocioController;
 
 /*
@@ -18,10 +19,12 @@ use App\Http\Controllers\ApiV1\ReglasNegocioController;
 
 Route::apiResource('reglas', ReglasNegocioController::class);
 
-Route::get('extraer/ordenes', [ApiV1Controller::class, 'isWorking']);
+Route::get('extraer/ordenes', [OrdenesController::class, 'extraer']);
 
-Route::get('filtrar/ordenes', [ApiV1Controller::class, 'isWorking']);
+Route::get('filtrar/ordenes', [OrdenesController::class, 'filtrar']);
 
-Route::get('validar/ordenes', [ApiV1Controller::class, 'isWorking']);
+Route::get('validar/ordenes', [OrdenesController::class, 'validar']);
 
-Route::get('enviar/ordenes', [ApiV1Controller::class, 'isWorking']);
+Route::get('enviar/ordenes', [OrdenesController::class, 'enviar']);
+
+Route::get('status', [ApiV1Controller::class, 'isWorking']);
