@@ -51,21 +51,20 @@ class OrdenesController extends Controller
             $ordenes = Ordenes::getOrders();
             $requester = new Requester();
             $validando = '2validando' . DIRECTORY_SEPARATOR;
-            $xrevalidar = '2validando' . DIRECTORY_SEPARATOR . 'xrevalidar' . DIRECTORY_SEPARATOR;
+            $exepciones = '1ordenes' . DIRECTORY_SEPARATOR . 'excepciones' . DIRECTORY_SEPARATOR;
 
-            foreach ($ordenes as $orden) {
+            for ($i=0; $i < 5; $i++) {
+                $orden = $ordenes[$i];
                 $ordenStorage = new Ordenes($orden, true);
                 $results = $requester->getOrderResults($ordenStorage);
 
-                if(!$results["success"]){
-                    dd("sin resultados");
-                    Storage::disk('local')->move($orden, $xrevalidar . $ordenStorage->getFileName());
+                if(!$results["success"] && $results["message"] == "Sin resultados"){
+                    Storage::disk('local')->move($orden, $exepciones . $ordenStorage->getFileName());
                 }else{
                     $ordenStorage->addResults($results);
                     $ordenStorage->applyRules();
                 }
             }
-
             
         } catch (\Throwable $th) {
             return response()->json([

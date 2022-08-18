@@ -80,23 +80,19 @@ class Requester
             $results = $resultsClient->GetResults($query);
             $microResults = $resultsClient->GetMicroResults($query);
 
-            dd($results, $microResults);
-
             //Logout para Token
             $this->logout();
 
             if(!isset($results->GetResultsResult) && !isset($microResults->GetMicroResultsResult)){
                 return array('success' => false, 'message' => "Sin resultados");
             }else{
-                dd($results);
-
-                //Formateo JSON
-                $xml = simplexml_load_string($results->GetResultsResult->any);
-                $json = json_encode($xml);
-                $array = json_decode($json, true);
+                $return = array('success' => true, 'data' => [
+                    'results' => isset($results->GetResultsResult) ? $results->GetResultsResult->Orders->LISOrder->LabTests->LISLabTest : false,
+                    'microResults' => isset($microResults->GetMicroResultsResult) ? $microResults->GetMicroResultsResult : false,
+                ]);
 
                 //Retorno datos
-                return array('success' => true, 'data' => $array["DefaultDataSet"]["SQL"]);
+                return $return;
             }
             
         } catch (\Throwable $e) {

@@ -26,11 +26,26 @@ class Ordenes
     public array $dataMicro;
 
     public function addResults($results){
+        if($results["data"]["results"] != false){
+            foreach ($results["data"]["results"] as $result) {
+                array_push($this->dataClinica, [
+                    "testId" => $result->TestID,
+                    "testStatus" => $result->TestStatus,
+                    "nombreTest" => $result->TestName,
+                    "lastVerified" => "",
+                ]);
+                
+            }
+        }
 
+        if($results["data"]["microResults"] != false){
+
+        }
     }
 
     public function applyRules(){
         $reglas = Reglas::all();
+        dd($reglas, $this);
     }
 
     public function getFileName(){
