@@ -4,6 +4,7 @@ namespace App;
 
 use SoapClient;
 use SoapFault;
+use App\Models\Ordenes;
 
 class Requester
 {
@@ -57,6 +58,47 @@ class Requester
             //Retorno datos
             return array('success' => true, 'data' => $array["DefaultDataSet"]["SQL"]);
 
+        } catch (\Throwable $e) {
+            return array('success' => false, 'message' => $e->getMessage());
+        }
+    }
+
+    public function getOrderResults(Ordenes $orden){
+        try {
+
+            //Login para Token
+            $this->login();
+
+            //Nuevo cliente wOrders y traigo resultados
+            $resultsClient = new SoapClient($this->soapsDir . 'wso.ws.wResults.xml', $this->soapConfig);
+            $query = array(
+                'pstrSessionKey' => $this->token,
+                'pstrSampleID' => $orden->sc,
+                'pstrRegisterDate' => $orden->fechaExamen,
+            );
+
+            $results = $resultsClient->GetResults($query);
+            $microResults = $resultsClient->GetMicroResults($query);
+
+            dd($results, $microResults);
+
+            //Logout para Token
+            $this->logout();
+
+            if(!isset($results->GetResultsResult) && !isset($microResults->GetMicroResultsResult)){
+                return array('success' => false, 'message' => "Sin resultados");
+            }else{
+                dd($results);
+
+                //Formateo JSON
+                $xml = simplexml_load_string($results->GetResultsResult->any);
+                $json = json_encode($xml);
+                $array = json_decode($json, true);
+
+                //Retorno datos
+                return array('success' => true, 'data' => $array["DefaultDataSet"]["SQL"]);
+            }
+            
         } catch (\Throwable $e) {
             return array('success' => false, 'message' => $e->getMessage());
         }

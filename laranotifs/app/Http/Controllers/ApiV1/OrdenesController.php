@@ -16,7 +16,7 @@ class OrdenesController extends Controller
             $ordenes = $requester->fetchOrdenes();
 
             if($ordenes["success"]){
-                $baseDir = '1ordenes'. DIRECTORY_SEPARATOR;
+                $baseDir = '1ordenes' . DIRECTORY_SEPARATOR;
                 $cont = 0;
 
                 foreach ($ordenes["data"] as $orden) {
@@ -47,13 +47,38 @@ class OrdenesController extends Controller
     }
 
     public function filtrar(){
+        try {
+            $ordenes = Ordenes::getOrders();
+            $requester = new Requester();
+            $validando = '2validando' . DIRECTORY_SEPARATOR;
+            $xrevalidar = '2validando' . DIRECTORY_SEPARATOR . 'xrevalidar' . DIRECTORY_SEPARATOR;
 
+            foreach ($ordenes as $orden) {
+                $ordenStorage = new Ordenes($orden, true);
+                $results = $requester->getOrderResults($ordenStorage);
+
+                if(!$results["success"]){
+                    dd("sin resultados");
+                    Storage::disk('local')->move($orden, $xrevalidar . $ordenStorage->getFileName());
+                }else{
+                    $ordenStorage->addResults($results);
+                    $ordenStorage->applyRules();
+                }
+            }
+
+            
+        } catch (\Throwable $th) {
+            return response()->json([
+                'success'   => false,
+                'message'   => 'Algo salió mal :/'
+            ], 500);
+        }
     }
 
     public function validar(){
         
     }
-    
+
     public function enviar(){
         
     }

@@ -25,7 +25,14 @@ class Ordenes
     public array $dataClinica;
     public array $dataMicro;
 
-    
+    public function addResults($results){
+
+    }
+
+    public function applyRules(){
+        $reglas = Reglas::all();
+    }
+
     public function getFileName(){
         return "sc_" . $this->sc . "_" . $this->fechaExamen . ".json";
     }
@@ -37,25 +44,37 @@ class Ordenes
     public static function checkFile($fromServer){
         return Storage::disk('local')->exists('1ordenes'. DIRECTORY_SEPARATOR . "sc_" . $fromServer["SampleID"] . "_" . $fromServer["RegisterDate"] . ".json");
     }
+
+    public static function getOrders(){
+        return Storage::disk('local')->files('1ordenes');
+    }
     
-    public function __construct($fromServer){
-        $this->numeroHistoriaClinica = $fromServer["PatientID1"];
-        $this->nombresPaciente = $fromServer["FirstName"];
-        $this->apellidosPaciente = $fromServer["LastName"];
-        $this->sc = $fromServer["SampleID"];
-        $this->fechaExamen = $fromServer["RegisterDate"];
-        $this->horaExamen = $fromServer["RegisterHour"];
-        $this->doctor = $fromServer["Doctor"] ?? "";
-        $this->servicio = $fromServer["Service"];
-        $this->origen = $fromServer["Origin"];
-        $this->motivo = $fromServer["D_112"];
-        $this->especialidad = $fromServer["D_117"] ?? "";
-        $this->validacionClinica = -1;
-        $this->validacionMicro = -1;
-        $this->reglasFiltros = [];
-        $this->dataEnvio = [];
-        $this->logsEnvio = [];
-        $this->dataClinica = [];
-        $this->dataMicro = [];
+    public function __construct($data, $fromFile = false){
+        if($fromFile){
+            $file = Storage::disk('local')->get($data);
+            $decoded = json_decode($file);
+            foreach($decoded as $key => $value){
+                $this->{$key} = $value;
+            }
+        }else{
+            $this->numeroHistoriaClinica = $data["PatientID1"];
+            $this->nombresPaciente = $data["FirstName"];
+            $this->apellidosPaciente = $data["LastName"];
+            $this->sc = $data["SampleID"];
+            $this->fechaExamen = $data["RegisterDate"];
+            $this->horaExamen = $data["RegisterHour"];
+            $this->doctor = $data["Doctor"] ?? "";
+            $this->servicio = $data["Service"];
+            $this->origen = $data["Origin"];
+            $this->motivo = $data["D_112"];
+            $this->especialidad = $data["D_117"] ?? "";
+            $this->validacionClinica = -1;
+            $this->validacionMicro = -1;
+            $this->reglasFiltros = [];
+            $this->dataEnvio = [];
+            $this->logsEnvio = [];
+            $this->dataClinica = [];
+            $this->dataMicro = [];
+        }
     }
 }
