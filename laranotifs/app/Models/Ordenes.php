@@ -26,6 +26,7 @@ class Ordenes
     public array $dataMicro;
 
     public function addResults($results){
+        dd($results);
         if($results["data"]["results"] != false){
             foreach ($results["data"]["results"] as $result) {
                 array_push($this->dataClinica, [
@@ -34,7 +35,6 @@ class Ordenes
                     "nombreTest" => $result->TestName,
                     "lastVerified" => "",
                 ]);
-                
             }
         }
 
@@ -44,8 +44,53 @@ class Ordenes
     }
 
     public function applyRules(){
-        $reglas = Reglas::all();
-        dd($reglas, $this);
+        $reglas = [
+            "servicio" => Reglas::whereNotNull("x_servicio")->orderBy("ene", "desc")->get(),
+            "origen" => Reglas::whereNotNull("x_origen")->orderBy("ene", "desc")->get(),
+            "motivo" => Reglas::whereNotNull("x_motivo")->orderBy("ene", "desc")->get(),
+            "especialidad" => Reglas::whereNotNull("x_especialidad")->orderBy("ene", "desc")->get(),
+            "doctor" => Reglas::whereNotNull("x_medico")->orderBy("ene", "desc")->get(),
+            "dataClinica" => Reglas::whereNotNull("x_idprueba")->orderBy("ene", "desc")->get(),
+        ];
+
+        $dic = [
+            "servicio" => "x_servicio",
+            "origen" => "x_origen",
+            "motivo" => "x_motivo",
+            "especialidad" => "x_especialidad",
+            "doctor" => "x_medico",
+            "dataClinica" => "x_idprueba",
+        ];
+
+        $ene = true;
+        for ($i=0; $i < 2; $i++) { 
+            foreach ($reglas as $key => $aplicar) {
+                foreach ($aplicar as $regla) {
+                    if($regla->ene == $ene){
+                        if($key == "dataClinica"){
+
+                        }else{
+                            $dbProp = $dic[$key];
+                            if($this->$key == $regla->$dbProp){
+                                array_push($this->reglasFiltros, [
+                                    "idRegla" => $regla->id,
+                                    "nombreRegla" => $regla->nombre,
+                                    "tipoRegla" => $regla->ene ? "E" : "NE",
+                                    "aplicada" => date("Y-m-d e h:i:s"),
+                                ]);
+
+                                if($regla->add_json != null){
+                                    array_push($this->dataEnvio, [
+                                        "idRegla" => $regla->id,
+                                    ]+json_decode($regla->add_json, true));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            $ene = false;
+        }
     }
 
     public function getFileName(){

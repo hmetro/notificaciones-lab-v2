@@ -52,6 +52,7 @@ class OrdenesController extends Controller
             $requester = new Requester();
             $validando = '2validando' . DIRECTORY_SEPARATOR;
             $exepciones = '1ordenes' . DIRECTORY_SEPARATOR . 'excepciones' . DIRECTORY_SEPARATOR;
+            $cont = 0;
 
             for ($i=0; $i < 5; $i++) {
                 $orden = $ordenes[$i];
@@ -63,10 +64,21 @@ class OrdenesController extends Controller
                 }else{
                     $ordenStorage->addResults($results);
                     $ordenStorage->applyRules();
+                    $saved = Storage::disk('local')->put($validando . $ordenStorage->getFileName(), $ordenStorage->toJson());
+                    if($saved){
+                        Storage::disk('local')->delete($orden);
+                        $cont++;
+                    }
                 }
             }
+
+            return response()->json([
+                'success'   => true,
+                'message'   => $cont . ' nuevas ordenes filtradas. :D'
+            ], 200);
             
         } catch (\Throwable $th) {
+            dd($th);
             return response()->json([
                 'success'   => false,
                 'message'   => 'Algo salió mal :/'
