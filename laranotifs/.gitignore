@@ -15,9 +15,10 @@ yarn-error.log
 /.idea
 /.vscode
 /storage/orders.in.json/1ordenes/*.json
+/storage/orders.in.json/1ordenes/errores/*.json
 /storage/orders.in.json/2validando/*.json
+/storage/orders.in.json/2validando/errores/*.json
 /storage/orders.in.json/2validando/xrevalidar/*.json
 /storage/orders.in.json/3porenviar/*.json
 /storage/orders.in.json/4enviadas/*.json
 /storage/orders.in.json/4enviadas/errores/*.json
-/storage/orders.in.json/5excepciones/*.json

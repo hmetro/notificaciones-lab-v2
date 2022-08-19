@@ -33,7 +33,7 @@ class Requester
     
     //FUNCTIONS
 
-    public function fetchOrdenes(){
+    public function fetchOrdenes($tryOtherAuth  = false){
         try {
 
             //Login para Token
@@ -43,7 +43,7 @@ class Requester
             $ordenesClient = new SoapClient($this->soapsDir . 'wso.ws.wOrders.xml', $this->soapConfig);
             $list = $ordenesClient->GetList(array(
                 'pstrSessionKey' => $this->token,
-                'pstrRegisterDateFrom' => date('Y-m-d'),
+                'pstrRegisterDateFrom' => date('Y-m-d', strtotime("-1 days")),
                 'pstrRegisterDateTo' => date('Y-m-d'),
             ));
             
@@ -56,18 +56,30 @@ class Requester
             $array = json_decode($json, true);
 
             //Retorno datos
-            return array('success' => true, 'data' => $array["DefaultDataSet"]["SQL"]);
+            if(isset($array["DefaultDataSet"]["SQL"])){
+                return array('success' => true, 'data' => $array["DefaultDataSet"]["SQL"]);
+            }else{
+                return array('success' => true, 'data' => []);
+            }
 
         } catch (\Throwable $e) {
-            return array('success' => false, 'message' => $e->getMessage());
+            if($e->message == "SOAP-ERROR: Encoding: Violation of encoding rules"){
+                $this->fetchOrdenes(true);
+            }else{
+                return array('success' => false, 'message' => $e->getMessage());
+            }
         }
     }
 
-    public function getOrderResults(Ordenes $orden){
+    public function getOrderResults(Ordenes $orden, $tryOtherAuth = false){
         try {
 
             //Login para Token
-            $this->login();
+            if($tryOtherAuth){
+                $this->login("CWMETRO", "CWM3TR0");
+            }else{
+                $this->login();
+            }
 
             //Nuevo cliente wOrders y traigo resultados
             $resultsClient = new SoapClient($this->soapsDir . 'wso.ws.wResults.xml', $this->soapConfig);
@@ -88,7 +100,7 @@ class Requester
             }else{
                 $return = array('success' => true, 'data' => [
                     'results' => isset($results->GetResultsResult) ? $results->GetResultsResult->Orders->LISOrder->LabTests->LISLabTest : false,
-                    'microResults' => isset($microResults->GetMicroResultsResult) ? $microResults->GetMicroResultsResult : false,
+                    'microResults' => isset($microResults->GetMicroResultsResult) ? $microResults->GetMicroResultsResult->Orders->LISOrder->MicSpecs->LISMicSpec : false,
                 ]);
 
                 //Retorno datos
@@ -96,17 +108,21 @@ class Requester
             }
             
         } catch (\Throwable $e) {
-            return array('success' => false, 'message' => $e->getMessage());
+            if($e->faultstring == "SOAP-ERROR: Encoding: Violation of encoding rules"){
+                return $this->getOrderResults($orden, true);
+            }else{
+                return array('success' => false, 'message' => $e->getMessage());
+            }
         }
     }
 
-    public function login(){
+    public function login($user = "CONSULTA", $pass = "CONSULTA1"){
         try {
 
             // Login
             $Login = $this->client->Login(array(
-                "pstrUserName" => "CONSULTA",
-                "pstrPassword" => "CONSULTA1",
+                "pstrUserName" => $user,
+                "pstrPassword" => $pass,
             ));
 
             // Guardo Token

@@ -12,11 +12,11 @@ class Ordenes
     public string $sc;
     public string $fechaExamen;
     public string $horaExamen;
-    public ?string $doctor;
+    public string $doctor;
     public string $servicio;
     public string $origen;
     public string $motivo;
-    public ?string $especialidad;
+    public string $especialidad;
     public int $validacionClinica;
     public int $validacionMicro;
     public array $reglasFiltros;
@@ -26,9 +26,10 @@ class Ordenes
     public array $dataMicro;
 
     public function addResults($results){
-        dd($results);
-        if($results["data"]["results"] != false){
+
+        if($results["data"]["results"] != false && !isset($results["data"]["results"]->TestID)){
             foreach ($results["data"]["results"] as $result) {
+                
                 array_push($this->dataClinica, [
                     "testId" => $result->TestID,
                     "testStatus" => $result->TestStatus,
@@ -36,11 +37,38 @@ class Ordenes
                     "lastVerified" => "",
                 ]);
             }
+        }else if(isset($results["data"]["results"]->TestID)){
+            array_push($this->dataClinica, [
+                "testId" => $results["data"]["results"]->TestID,
+                "testStatus" => $results["data"]["results"]->TestStatus,
+                "nombreTest" => $results["data"]["results"]->TestName,
+                "lastVerified" => "",
+            ]);
         }
 
-        if($results["data"]["microResults"] != false){
-
+        if($results["data"]["microResults"] != false && !isset($results["data"]["microResults"]->SpecimenName)){
+            dd($results);
+        }else if (isset($results["data"]["microResults"]->SpecimenName)){
+            $listaMicro = $results["data"]["microResults"]->MicTests->LISLabTest;
+            if(isset($listaMicro->TestID)){
+                array_push($this->dataMicro, [
+                    "testId" => $listaMicro->TestID,
+                    "testStatus" => $listaMicro->TestStatus,
+                    "nombreTest" => $listaMicro->TestName,
+                    "lastVerified" => "",
+                ]);
+            }else{
+                foreach ($listaMicro as $result) {
+                    array_push($this->dataMicro, [
+                        "testId" => $result->TestID,
+                        "testStatus" => $result->TestStatus,
+                        "nombreTest" => $result->TestName,
+                        "lastVerified" => "",
+                    ]);
+                }
+            }
         }
+        
     }
 
     public function applyRules(){
@@ -68,7 +96,23 @@ class Ordenes
                 foreach ($aplicar as $regla) {
                     if($regla->ene == $ene){
                         if($key == "dataClinica"){
-
+                            $dbProp = $dic[$key];
+                            foreach (array_combine($this->dataClinica, $this->dataMicro) as $result) {
+                                if($result->testId == $regla->$dbProp){
+                                    array_push($this->reglasFiltros, [
+                                        "idRegla" => $regla->id,
+                                        "nombreRegla" => $regla->nombre,
+                                        "tipoRegla" => $regla->ene ? "E" : "NE",
+                                        "aplicada" => date("Y-m-d e h:i:s"),
+                                    ]);
+    
+                                    if($regla->add_json != null){
+                                        array_push($this->dataEnvio, [
+                                            "idRegla" => $regla->id,
+                                        ]+json_decode($regla->add_json, true));
+                                    }
+                                }
+                            }
                         }else{
                             $dbProp = $dic[$key];
                             if($this->$key == $regla->$dbProp){
@@ -91,6 +135,8 @@ class Ordenes
             }
             $ene = false;
         }
+
+        return !(count($this->reglasFiltros) == 0);
     }
 
     public function getFileName(){
@@ -124,9 +170,9 @@ class Ordenes
             $this->fechaExamen = $data["RegisterDate"];
             $this->horaExamen = $data["RegisterHour"];
             $this->doctor = $data["Doctor"] ?? "";
-            $this->servicio = $data["Service"];
+            $this->servicio = $data["Service"] ?? "";
             $this->origen = $data["Origin"];
-            $this->motivo = $data["D_112"];
+            $this->motivo = $data["D_112"] ?? "";
             $this->especialidad = $data["D_117"] ?? "";
             $this->validacionClinica = -1;
             $this->validacionMicro = -1;
