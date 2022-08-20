@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ApiV1\ApiV1Controller;
 use App\Http\Controllers\ApiV1\OrdenesController;

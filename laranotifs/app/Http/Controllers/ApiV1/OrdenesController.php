@@ -52,14 +52,16 @@ class OrdenesController extends Controller
     {
         try {
             $ordenes = Ordenes::getOrders();
+            $numOrdenes = count($ordenes);
             $requester = new Requester();
             $validando = '2validando' . DIRECTORY_SEPARATOR;
             $exepciones = '1ordenes' . DIRECTORY_SEPARATOR . 'errores' . DIRECTORY_SEPARATOR;
             $exepcionesValidando = '2validando' . DIRECTORY_SEPARATOR . 'errores' . DIRECTORY_SEPARATOR;
             $cont = 0;
 
-            if (count($ordenes) != 0) {
-                for ($i = 0; $i < 3; $i++) {
+            if ($numOrdenes != 0) {
+                $lim = $numOrdenes < 5 ? $numOrdenes : 5;
+                for ($i = 0; $i < $lim; $i++) {
                     $orden = $ordenes[$i];
                     $ordenStorage = new Ordenes($orden, true);
                     $results = $requester->getOrderResults($ordenStorage);
@@ -105,9 +107,53 @@ class OrdenesController extends Controller
 
     public function validar()
     {
+        try {
+            $ordenes = Ordenes::getValidOrders();
+            $revalidar = '2validando' . DIRECTORY_SEPARATOR . 'xrevalidar' . DIRECTORY_SEPARATOR;
+            $porenviar = '3porenviar' . DIRECTORY_SEPARATOR;
+            $contEnviar = 0;
+            $contRevalidar = 0;
+
+            if(count($ordenes) != 0){
+                foreach ($ordenes as $orden) {
+                    $ordenStorage = new Ordenes($orden, true);
+                    if($ordenStorage->isValid()){
+                        $saved = Storage::disk('local')->put($porenviar . $ordenStorage->getFileName(), $ordenStorage->toJson());
+                        if ($saved) {
+                            Storage::disk('local')->delete($orden);
+                            $contEnviar++;
+                        }
+                    }else{
+                        $saved = Storage::disk('local')->put($revalidar . $ordenStorage->getFileName(), $ordenStorage->toJson());
+                        if ($saved) {
+                            Storage::disk('local')->delete($orden);
+                            $contRevalidar++;
+                        }
+                    }
+                }
+                return response()->json([
+                    'success'   => true,
+                    'message'   => $contEnviar . ' ordenes listas para enviar y ' . $contRevalidar .' ordenes enviadas a revalidar. :D'
+                ], 200);
+            }else{
+                $contRevalidadas = Ordenes::reValidate();
+                return response()->json([
+                    'success'   => true,
+                    'message'   => $contRevalidadas . ' ordenes listas para validar nuevamente. :D'
+                ], 200);
+            }
+
+        } catch (\Throwable $th) {
+            dd($th);
+            return response()->json([
+                'success'   => false,
+                'message'   => 'Algo salió mal :/'
+            ], 500);
+        }
     }
 
     public function enviar()
     {
+        dd("enviando");
     }
 }

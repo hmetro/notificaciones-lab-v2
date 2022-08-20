@@ -22,6 +22,8 @@ class Requester
 
     public string $soapsDir = "NO_DIR";
 
+    public bool $onRetry = false;
+
     public ?SoapClient $client;
 
     //CONSTRUCTOR
@@ -33,7 +35,7 @@ class Requester
     
     //FUNCTIONS
 
-    public function fetchOrdenes($tryOtherAuth  = false){
+    public function fetchOrdenes(){
         try {
 
             //Login para Token
@@ -43,7 +45,7 @@ class Requester
             $ordenesClient = new SoapClient($this->soapsDir . 'wso.ws.wOrders.xml', $this->soapConfig);
             $list = $ordenesClient->GetList(array(
                 'pstrSessionKey' => $this->token,
-                'pstrRegisterDateFrom' => date('Y-m-d', strtotime("-1 days")),
+                'pstrRegisterDateFrom' => date('Y-m-d'),
                 'pstrRegisterDateTo' => date('Y-m-d'),
             ));
             
@@ -71,12 +73,13 @@ class Requester
         }
     }
 
-    public function getOrderResults(Ordenes $orden, $tryOtherAuth = false){
+    public function getOrderResults(Ordenes $orden, $tryOtherAuth = false, $reRes = -1){
         try {
 
             //Login para Token
             if($tryOtherAuth){
                 $this->login("CWMETRO", "CWM3TR0");
+                $this->onRetry = true;
             }else{
                 $this->login();
             }
@@ -89,8 +92,8 @@ class Requester
                 'pstrRegisterDate' => $orden->fechaExamen,
             );
 
-            $results = $resultsClient->GetResults($query);
-            $microResults = $resultsClient->GetMicroResults($query);
+            $results = $reRes == -1 || $reRes == 0 ? $resultsClient->GetResults($query) : null;
+            $microResults = $reRes == -1 || $reRes == 1 ? $resultsClient->GetMicroResults($query) : null;
 
             //Logout para Token
             $this->logout();
@@ -109,8 +112,9 @@ class Requester
             
         } catch (\Throwable $e) {
             if($e->faultstring == "SOAP-ERROR: Encoding: Violation of encoding rules"){
-                return $this->getOrderResults($orden, true);
+                return $this->onRetry == true ? array('success' => false, 'message' => "Sin resultados") : $this->getOrderResults($orden, true);
             }else{
+                dd($e);
                 return array('success' => false, 'message' => $e->getMessage());
             }
         }
