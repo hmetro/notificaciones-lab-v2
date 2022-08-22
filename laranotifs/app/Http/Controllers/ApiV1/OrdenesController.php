@@ -72,18 +72,7 @@ class OrdenesController extends Controller
                     } else {
                         $ordenStorage->addResults($results);
                         if ($ordenStorage->applyRules()) {
-                            $enviarPac = true;
-                            $enviarDoc = false;
-
-                            foreach (array_reverse($ordenStorage->dataEnvio) as $data) {
-                                if($data["tipoRegla"] == "NE" && $data["direccion"] == 0){
-                                    $enviarPac = false;
-                                }
-                                if($data["tipoRegla"] == "E" && $data["direccion"] != 0){
-                                    $enviarDoc = true;
-                                }
-                            }
-                            if ($enviarDoc || $enviarPac) {
+                            if (count($ordenStorage->emails) > 0) {
                                 $saved = Storage::disk('local')->put($validando . $ordenStorage->getFileName(), $ordenStorage->toJson());
                                 if ($saved) {
                                     Storage::disk('local')->delete($orden);
@@ -177,37 +166,53 @@ class OrdenesController extends Controller
     {
         try {
             $ordenes = Ordenes::getOrdersToSend();
-            $revalidar = '2validando' . DIRECTORY_SEPARATOR . 'xrevalidar' . DIRECTORY_SEPARATOR;
-            $porenviar = '3porenviar' . DIRECTORY_SEPARATOR;
-            $contEnviar = 0;
-            $contRevalidar = 0;
+            $requester = new Requester();
+            $errorenviadas = '4enviadas' . DIRECTORY_SEPARATOR . 'errores' . DIRECTORY_SEPARATOR;
+            $errorporenviar = '3porenviar' . DIRECTORY_SEPARATOR . 'errores' . DIRECTORY_SEPARATOR;
+            $enviadas = '4enviadas' . DIRECTORY_SEPARATOR;
+            $contEnviadas = 0;
+            $contErrores = 0;
 
             if(count($ordenes) != 0){
                 foreach ($ordenes as $orden) {
                     $ordenStorage = new Ordenes($orden, true);
-                    if($ordenStorage->isValid()){
-                        $saved = Storage::disk('local')->put($porenviar . $ordenStorage->getFileName(), $ordenStorage->toJson());
-                        if ($saved) {
-                            Storage::disk('local')->delete($orden);
-                            $contEnviar++;
+                    $resultpdf = $requester->fetchPDF($ordenStorage);
+                    if($resultpdf["success"] == true){
+                        $errores = false;
+                        foreach ($ordenStorage->emails as $mail) {
+                            if(!$ordenStorage->sendNotification($resultpdf, $mail)){
+                                $errores = true;
+                            }
+                        }
+                        if($errores){
+                            $saved = Storage::disk('local')->put($errorenviadas . $ordenStorage->getFileName(), $ordenStorage->toJson());
+                            if ($saved) {
+                                Storage::disk('local')->delete($orden);
+                                $contErrores++;
+                            }
+                        }else{
+                            $saved = Storage::disk('local')->put($enviadas . $ordenStorage->getFileName(), $ordenStorage->toJson());
+                            if ($saved) {
+                                Storage::disk('local')->delete($orden);
+                                $contEnviadas++;
+                            }
                         }
                     }else{
-                        $saved = Storage::disk('local')->put($revalidar . $ordenStorage->getFileName(), $ordenStorage->toJson());
+                        $saved = Storage::disk('local')->put($errorporenviar . $ordenStorage->getFileName(), $ordenStorage->toJson());
                         if ($saved) {
                             Storage::disk('local')->delete($orden);
-                            $contRevalidar++;
+                            $contErrores++;
                         }
                     }
                 }
                 return response()->json([
                     'success'   => true,
-                    'message'   => $contEnviar . ' ordenes listas para enviar y ' . $contRevalidar .' ordenes enviadas a revalidar. :D'
+                    'message'   => $contEnviadas . ' ordenes enviadas y ' . $contErrores .' ordenes con error al enviar. :D'
                 ], 200);
             }else{
-                $contRevalidadas = Ordenes::reValidate();
                 return response()->json([
                     'success'   => true,
-                    'message'   => $contRevalidadas . ' ordenes listas para validar nuevamente. :D'
+                    'message'   => 'No hay ordenes por enviar :D'
                 ], 200);
             }
 

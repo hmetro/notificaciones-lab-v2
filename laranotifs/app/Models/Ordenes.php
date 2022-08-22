@@ -24,6 +24,7 @@ class Ordenes
     public array $reglasFiltros;
     public array $dataEnvio;
     public array $logsEnvio;
+    public array $emails;
     public array $dataClinica;
     public array $dataMicro;
 
@@ -123,6 +124,7 @@ class Ordenes
         ];
 
         $ene = true;
+        $addmails = true;
         for ($i=0; $i < 2; $i++) { 
             foreach ($reglas as $key => $aplicar) {
                 foreach ($aplicar as $regla) {
@@ -139,10 +141,16 @@ class Ordenes
                                     ]);
     
                                     if($regla->add_json != null){
+                                        $add = json_decode($regla->add_json, true);
                                         array_push($this->dataEnvio, [
                                             "idRegla" => $regla->id,
                                             "tipoRegla" => $regla->ene ? "E" : "NE",
-                                        ]+json_decode($regla->add_json, true));
+                                        ]+$add);
+                                        if($add["direccion"] != 0 || $add["direccion"] != 1){
+                                            array_push($this->emails, $add["direccion"]);
+                                        }else if($add["direccion"] == 0 && $regla->ene == false){
+                                            $addmails = false;
+                                        }
                                     }
                                 }
                             }
@@ -157,10 +165,16 @@ class Ordenes
                                 ]);
 
                                 if($regla->add_json != null){
+                                    $add = json_decode($regla->add_json, true);
                                     array_push($this->dataEnvio, [
                                         "idRegla" => $regla->id,
                                         "tipoRegla" => $regla->ene ? "E" : "NE",
-                                    ]+json_decode($regla->add_json, true));
+                                    ]+$add);
+                                    if($add["direccion"] != 0 || $add["direccion"] != 1){
+                                        array_push($this->emails, $add["direccion"]);
+                                    }else if($add["direccion"] == 0 && $regla->ene == false){
+                                        $addmails = false;
+                                    }
                                 }
                             }
                         }
@@ -168,6 +182,10 @@ class Ordenes
                 }
             }
             $ene = false;
+        }
+        if($addmails){
+            //añadir correos usuario
+            array_push($this->emails, $add["germariova@gmail.com"]);
         }
 
         return !(count($this->reglasFiltros) == 0);
@@ -259,6 +277,69 @@ class Ordenes
         }
     }
 
+    public function sendNotification($pdf, $to){
+        $file = base64_encode(file_get_contents($pdf['LINK_INFORME']));
+        $adjunto = array();
+
+        $adjunto[] = array(
+            'Name' => 'resultado_' . $this->sc . '.pdf',
+            'ContentType' => 'application/pdf',
+            'Content' => $file,
+        );
+
+        $body = array(
+            "TextBody" => "Resultado de Laboratorio - Metrovirtual",
+            'From' => 'Metrovirtual metrovirtual@hospitalmetropolitano.org',
+            'To' => $to,
+            'Subject' => "Nuevo resultado de Laboratorio",
+            'HtmlBody' => view('mail.template')->render(),
+            'Attachments' => $adjunto,
+            'Tag' => 'NRLPPCR',
+            'Bcc' => 'mchangcnt@gmail.com;resultadoslaboratorio@hmetro.med.ec',
+            'TrackLinks' => 'HtmlAndText',
+            'TrackOpens' => true,
+        );
+
+        $encoded = json_encode($body);
+
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL, "https://api.trx.icommarketing.com/email");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $encoded);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            'Accept: application/json',
+            'Content-Type: application/json',
+            'Content-Length: ' . strlen($encoded),
+            'X-Postmark-Server-Token: 75032b22-cf9b-4fd7-8eb4-e7446c8b118b',
+        ));
+
+        $result = curl_exec($ch);
+        if (curl_errno($ch)) {
+            $resultobj = curl_error($ch);
+            array_push($this->logsEnvio, array(
+                "email" => $to,
+                "log" => $resultobj,
+                "request" => $ch,
+                "success" => false
+            ));
+            return false;
+        }
+        
+        curl_close($ch);
+        $resultobj = json_decode($result);
+        array_push($this->logsEnvio, array(
+            "email" => $to,
+            "log" => $resultobj,
+            "request" => $ch,
+            "success" => true
+        ));
+
+        return true;
+    }
+
     public static function checkFile($fromServer){
         return Storage::disk('local')->exists('1ordenes'. DIRECTORY_SEPARATOR . "sc_" . $fromServer["SampleID"] . "_" . $fromServer["RegisterDate"] . ".json");
     }
@@ -304,6 +385,7 @@ class Ordenes
             $this->reglasFiltros = [];
             $this->dataEnvio = [];
             $this->logsEnvio = [];
+            $this->emails = [];
             $this->dataClinica = [];
             $this->dataMicro = [];
         }

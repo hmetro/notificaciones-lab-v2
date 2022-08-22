@@ -41,18 +41,34 @@ class Requester
 
             $reportClient = new SoapClient($this->soapsDir . 'wso.ws.wReports.wsdl.xml', $this->soapConfig);
 
-            $Preview = $reportClient->Preview(array(
+            $preview = $reportClient->Preview(array(
                 "pstrSessionKey" => $this->token,
-                "pstrSampleID" => $orden->sc, # '0015052333',
-                "pstrRegisterDate" => $orden->fechaExamen, # $FECHA_final[2] . '-' . $FECHA_final[1] . '-' . $FECHA_final[0], # '2018-11-05',
+                "pstrSampleID" => $orden->sc,
+                "pstrRegisterDate" => $orden->fechaExamen,
                 "pstrFormatDescription" => 'METROPOLITANO',
                 "pstrPrintTarget" => 'Destino por defecto',
             ));
 
-
             $this->logout();
+
+            if (isset($preview->PreviewResult) or $preview->PreviewResult == '0') {
+
+                if ($preview->PreviewResult == '0') {
+                    return array('success' => false, 'message' => "No existe el documento solicitado");
+                } else {
+                    return array(
+                        'status' => true,
+                        'data' => $preview->PreviewResult,
+                    );
+                }
+
+            }
+
+            return array('success' => false, 'message' => "No existe el documento solicitado");
+
         } catch (\Throwable $th) {
-            //throw $th;
+            dd($th);
+            return array('success' => false, 'message' => $th->getMessage());
         }
     }
 
@@ -86,11 +102,7 @@ class Requester
             }
 
         } catch (\Throwable $e) {
-            if($e->message == "SOAP-ERROR: Encoding: Violation of encoding rules"){
-                $this->fetchOrdenes(true);
-            }else{
-                return array('success' => false, 'message' => $e->getMessage());
-            }
+            return array('success' => false, 'message' => $e->getMessage());
         }
     }
 
