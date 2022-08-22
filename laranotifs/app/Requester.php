@@ -35,6 +35,27 @@ class Requester
     
     //FUNCTIONS
 
+    public function fetchPDF(Ordenes $orden){
+        try {
+            $this->login();
+
+            $reportClient = new SoapClient($this->soapsDir . 'wso.ws.wReports.wsdl.xml', $this->soapConfig);
+
+            $Preview = $reportClient->Preview(array(
+                "pstrSessionKey" => $this->token,
+                "pstrSampleID" => $orden->sc, # '0015052333',
+                "pstrRegisterDate" => $orden->fechaExamen, # $FECHA_final[2] . '-' . $FECHA_final[1] . '-' . $FECHA_final[0], # '2018-11-05',
+                "pstrFormatDescription" => 'METROPOLITANO',
+                "pstrPrintTarget" => 'Destino por defecto',
+            ));
+
+
+            $this->logout();
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+    }
+
     public function fetchOrdenes(){
         try {
 

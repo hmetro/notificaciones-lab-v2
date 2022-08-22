@@ -51,7 +51,6 @@ class Ordenes
             }
     
             if($results["data"]["microResults"] != false && !isset($results["data"]["microResults"]->SpecimenName)){
-                dd($results);
                 $listaMicro = $results["data"]["microResults"];
                 foreach ($listaMicro as $result) {
                     $res = $result->MicTests->LISLabTest;
@@ -142,6 +141,7 @@ class Ordenes
                                     if($regla->add_json != null){
                                         array_push($this->dataEnvio, [
                                             "idRegla" => $regla->id,
+                                            "tipoRegla" => $regla->ene ? "E" : "NE",
                                         ]+json_decode($regla->add_json, true));
                                     }
                                 }
@@ -159,6 +159,7 @@ class Ordenes
                                 if($regla->add_json != null){
                                     array_push($this->dataEnvio, [
                                         "idRegla" => $regla->id,
+                                        "tipoRegla" => $regla->ene ? "E" : "NE",
                                     ]+json_decode($regla->add_json, true));
                                 }
                             }
@@ -272,6 +273,10 @@ class Ordenes
 
     public static function getToRevalidateOrders(){
         return Storage::disk('local')->files('2validando' . DIRECTORY_SEPARATOR . 'xrevalidar');
+    }
+
+    public static function getOrdersToSend(){
+        return Storage::disk('local')->files('3porenviar');
     }
     
     public function __construct($data, $fromFile = false){
