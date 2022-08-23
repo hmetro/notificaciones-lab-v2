@@ -26,4 +26,6 @@ Route::get('validar/ordenes', [OrdenesController::class, 'validar']);
 
 Route::get('enviar/ordenes', [OrdenesController::class, 'enviar']);
 
+Route::get('listar/ordenes', [OrdenesController::class, 'listar']);
+
 Route::get('status', [ApiV1Controller::class, 'isWorking']);

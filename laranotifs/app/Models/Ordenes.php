@@ -146,7 +146,7 @@ class Ordenes
                                             "idRegla" => $regla->id,
                                             "tipoRegla" => $regla->ene ? "E" : "NE",
                                         ]+$add);
-                                        if($add["direccion"] != 0 || $add["direccion"] != 1){
+                                        if($add["direccion"] != 0 && $add["direccion"] != 1){
                                             array_push($this->emails, $add["direccion"]);
                                         }else if($add["direccion"] == 0 && $regla->ene == false){
                                             $addmails = false;
@@ -170,7 +170,7 @@ class Ordenes
                                         "idRegla" => $regla->id,
                                         "tipoRegla" => $regla->ene ? "E" : "NE",
                                     ]+$add);
-                                    if($add["direccion"] != 0 || $add["direccion"] != 1){
+                                    if($add["direccion"] != 0 && $add["direccion"] != 1){
                                         array_push($this->emails, $add["direccion"]);
                                     }else if($add["direccion"] == 0 && $regla->ene == false){
                                         $addmails = false;
@@ -185,7 +185,7 @@ class Ordenes
         }
         if($addmails){
             //añadir correos usuario
-            array_push($this->emails, $add["germariova@gmail.com"]);
+            array_push($this->emails, "asorellana4@gmail.com");
         }
 
         return !(count($this->reglasFiltros) == 0);
@@ -278,7 +278,7 @@ class Ordenes
     }
 
     public function sendNotification($pdf, $to){
-        $file = base64_encode(file_get_contents($pdf['LINK_INFORME']));
+        $file = base64_encode(file_get_contents($pdf));
         $adjunto = array();
 
         $adjunto[] = array(
@@ -287,12 +287,14 @@ class Ordenes
             'Content' => $file,
         );
 
+        $content = "Estimado(a).- <br/>". $this->nombresPaciente . " " . $this->apellidosPaciente ." está disponible un nuevo resultado de Laboratorio. <br/> Fecha de Examen: " . $this->fechaExamen;
+
         $body = array(
             "TextBody" => "Resultado de Laboratorio - Metrovirtual",
             'From' => 'Metrovirtual metrovirtual@hospitalmetropolitano.org',
             'To' => $to,
             'Subject' => "Nuevo resultado de Laboratorio",
-            'HtmlBody' => view('mail.template')->render(),
+            'HtmlBody' => view('mail.template', compact("content"))->render(),
             'Attachments' => $adjunto,
             'Tag' => 'NRLPPCR',
             'Bcc' => 'mchangcnt@gmail.com;resultadoslaboratorio@hmetro.med.ec',
@@ -344,20 +346,28 @@ class Ordenes
         return Storage::disk('local')->exists('1ordenes'. DIRECTORY_SEPARATOR . "sc_" . $fromServer["SampleID"] . "_" . $fromServer["RegisterDate"] . ".json");
     }
 
-    public static function getOrders(){
-        return Storage::disk('local')->files('1ordenes');
+    public static function getOrders($errors = false){
+        $extra = $errors ? DIRECTORY_SEPARATOR . "errores" : "";
+        return Storage::disk('local')->files('1ordenes' . $extra);
     }
 
-    public static function getValidOrders(){
-        return Storage::disk('local')->files('2validando');
+    public static function getValidOrders($errors = false){
+        $extra = $errors ? DIRECTORY_SEPARATOR . "errores" : "";
+        return Storage::disk('local')->files('2validando' . $extra);
     }
 
     public static function getToRevalidateOrders(){
         return Storage::disk('local')->files('2validando' . DIRECTORY_SEPARATOR . 'xrevalidar');
     }
 
-    public static function getOrdersToSend(){
-        return Storage::disk('local')->files('3porenviar');
+    public static function getOrdersToSend($errors = false){
+        $extra = $errors ? DIRECTORY_SEPARATOR . "errores" : "";
+        return Storage::disk('local')->files('3porenviar' . $extra);
+    }
+
+    public static function getSendedOrders($errors = false){
+        $extra = $errors ? DIRECTORY_SEPARATOR . "errores" : "";
+        return Storage::disk('local')->files('4enviadas' . $extra);
     }
     
     public function __construct($data, $fromFile = false){

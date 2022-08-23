@@ -43,6 +43,8 @@ class Requester
 
             $preview = $reportClient->Preview(array(
                 "pstrSessionKey" => $this->token,
+                // "pstrSampleID" => "0018847841",
+                // "pstrRegisterDate" => "2022-08-17",
                 "pstrSampleID" => $orden->sc,
                 "pstrRegisterDate" => $orden->fechaExamen,
                 "pstrFormatDescription" => 'METROPOLITANO',
@@ -57,7 +59,7 @@ class Requester
                     return array('success' => false, 'message' => "No existe el documento solicitado");
                 } else {
                     return array(
-                        'status' => true,
+                        'success' => true,
                         'data' => $preview->PreviewResult,
                     );
                 }

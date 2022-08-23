@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Requester;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Ordenes;
+use Illuminate\Http\Request;
 
 class OrdenesController extends Controller
 {
@@ -180,9 +181,10 @@ class OrdenesController extends Controller
                     if($resultpdf["success"] == true){
                         $errores = false;
                         foreach ($ordenStorage->emails as $mail) {
-                            if(!$ordenStorage->sendNotification($resultpdf, $mail)){
+                            if(!$ordenStorage->sendNotification($resultpdf["data"], $mail)){
                                 $errores = true;
                             }
+                            dd("1 sended");
                         }
                         if($errores){
                             $saved = Storage::disk('local')->put($errorenviadas . $ordenStorage->getFileName(), $ordenStorage->toJson());
@@ -223,5 +225,77 @@ class OrdenesController extends Controller
                 'message'   => 'Algo salió mal :/'
             ], 500);
         }
+    }
+
+    public function listar(Request $request){
+        $tipoOrdenes = $request->input('tipo');
+        $errores = $request->input('errores');
+        $limit = $request->input('limit') ? $request->input('limit')*1 : 10;
+        $withdata = $request->input('withdata');
+        $page = $request->input('page') ? $request->input('page')*1 : 1;
+
+        switch ($tipoOrdenes) {
+            case 'ordenes':
+                $ordenes = Ordenes::getOrders($errores);
+                break;
+            case 'validando':
+                $ordenes = Ordenes::getValidOrders($errores);
+                break;
+            case 'revalidando':
+                $ordenes = Ordenes::getToRevalidateOrders();
+                break;
+            case 'porenviar':
+                $ordenes = Ordenes::getOrdersToSend($errores);
+                break;
+            case 'enviadas':
+                $ordenes = Ordenes::getSendedOrders($errores);
+                break;
+
+            default:
+                return response()->json([
+                    'success'   => false,
+                    'message'   => 'Usa query params tipo=[ordenes, validando, revalidando, porenviar, enviadas], opcional errores=[0,1], limit=[number, deffault=10], withdata=[0,1], page=[number, deffault=1]'
+                ], 400);
+                break;
+        }
+
+        $numOrdenes = count($ordenes);
+        $lastPage = (int) ceil($numOrdenes/$limit);
+        $data = array();
+        $inic = $limit*($page-1) >= $numOrdenes ? 0 : $limit*($page-1);
+        $fin = $limit*$page >= $numOrdenes ? $numOrdenes : $limit*($page);
+        if($inic == 0 && $fin == $numOrdenes){
+            $inic = 0;
+            $fin = 0;
+        }
+
+        // dd(array(
+        //     'page' => $page,
+        //     'limit' => $limit,
+        //     'total' => $numOrdenes,
+        //     'last_page' => $lastPage,
+        //     'inic' => $inic,
+        //     'fin' => $fin
+        // ));
+
+        for ($i=$inic; $i < $fin; $i++) {
+            if($withdata){
+                array_push($data, get_object_vars(new Ordenes($ordenes[$i], true)));
+            }else{
+                array_push($data, $ordenes[$i]);
+            }
+            
+        }
+
+        return response()->json([
+            'success'   => true,
+            'data'   => $data,
+            'pagination' => array(
+                'page' => $page,
+                'limit' => $limit,
+                'total' => $numOrdenes,
+                'last_page' => $lastPage
+            )
+        ], 200);
     }
 }

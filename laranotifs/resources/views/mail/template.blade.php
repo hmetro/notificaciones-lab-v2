@@ -225,7 +225,7 @@
                                                                 Nuevo resultado
                                                                 de Laboratorio
                                                             </h3>
-                                                            <p>{{content}}</p>
+                                                            <p>{!! nl2br($content) !!}</p>
                                                             <p>
                                                                 <b>Nota:</b>
                                                                 Recuerde que la
