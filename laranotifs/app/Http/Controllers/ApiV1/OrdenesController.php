@@ -262,8 +262,8 @@ class OrdenesController extends Controller
         $lastPage = (int) ceil($numOrdenes/$limit);
         $data = array();
         $inic = $limit*($page-1) >= $numOrdenes ? 0 : $limit*($page-1);
-        $fin = $limit*$page >= $numOrdenes ? $numOrdenes : $limit*($page);
-        if($inic == 0 && $fin == $numOrdenes){
+        $fin = $limit*$page > $numOrdenes ? $numOrdenes : $limit*($page);
+        if($inic == 0 && $fin == $numOrdenes && $limit < $numOrdenes){
             $inic = 0;
             $fin = 0;
         }
