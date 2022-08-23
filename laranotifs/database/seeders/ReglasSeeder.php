@@ -40,7 +40,7 @@ class ReglasSeeder extends Seeder
             'x_especialidad' => null,
             'x_medico' => null,
             'x_idprueba' => null,
-            'add_json' => null,
+            'add_json' => '{"direccion": 0}',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
