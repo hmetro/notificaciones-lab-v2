@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:s0="http://tempuri.org" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" targetNamespace="http://tempuri.org">
+    <types>
+        <s:schema elementFormDefault="qualified" targetNamespace="http://tempuri.org">
+            <s:element name="GetList">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" name="pstrSessionKey" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrPatientID1" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrPatientID2" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrPatientID3" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrFirstName" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrLastName" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrSeconSurname" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrSurNameAndName" type="s:string"/>
+                        <s:element minOccurs="0" name="pintAgeUnit" type="s:long"/>
+                        <s:element minOccurs="0" name="pintAgeFrom" type="s:string"/>
+                        <s:element minOccurs="0" name="pintAgeTo" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrBirthdateFrom" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrBirthdateTo" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrSex" type="s:string"/>
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="GetListResponse">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element name="GetListResult" type="s0:DataSet"/>
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:complexType name="DataSet">
+                <s:sequence>
+                    <s:element ref="s:schema"/>
+                    <s:any/>
+                </s:sequence>
+            </s:complexType>
+            <s:element name="GetPreOrderPatientsList">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" name="pstrSessionKey" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrFilter" type="s:string"/>
+                        <s:element minOccurs="0" name="dtDemoList" type="s0:ArrayOfDemographicDemographic"/>
+                        <s:element minOccurs="0" name="pstrLastRegisterID" type="s:string"/>
+                        <s:element minOccurs="0" name="pblnPhlebotomistMode" type="s:boolean"/>
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:complexType name="ArrayOfDemographicDemographic">
+                <s:sequence>
+                    <s:element maxOccurs="unbounded" minOccurs="0" name="Demographic" nillable="true" type="s0:Demographic"/>
+                </s:sequence>
+            </s:complexType>
+            <s:complexType name="Demographic">
+                <s:sequence>
+                    <s:element minOccurs="0" name="InternalDemographicID" type="s:long"/>
+                    <s:element minOccurs="0" name="DemographicCode" type="s:string"/>
+                    <s:element minOccurs="0" name="DemographicName">
+                        <s:simpleType>
+                            <s:restriction base="s:string">
+                                <s:maxLength value="12"/>
+                            </s:restriction>
+                        </s:simpleType>
+                    </s:element>
+                    <s:element minOccurs="0" name="DemographicUse" type="s:string"/>
+                    <s:element minOccurs="0" name="Mandatory" type="s:long"/>
+                    <s:element minOccurs="0" name="DisplayOrder" type="s:long"/>
+                    <s:element minOccurs="0" name="DemographicType" type="s:long"/>
+                    <s:element minOccurs="0" name="DemographicCurrentValue">
+                        <s:simpleType>
+                            <s:restriction base="s:string">
+                                <s:maxLength value="255"/>
+                            </s:restriction>
+                        </s:simpleType>
+                    </s:element>
+                    <s:element minOccurs="0" name="DemographicCurrentCode" type="s:string"/>
+                </s:sequence>
+            </s:complexType>
+            <s:element name="GetPreOrderPatientsListResponse">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element name="GetPreOrderPatientsListResult" type="s0:DataSet"/>
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="SetDemographicValue">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" name="pstrSessionKey" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrPatientID1" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrDemographicID" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrDemographicValue" type="s:string"/>
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="SetDemographicValueResponse">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element name="SetDemographicValueResult" type="s:long"/>
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+        </s:schema>
+    </types>
+    <message name="GetListSoapIn">
+        <part name="parameters" element="s0:GetList"/>
+    </message>
+    <message name="GetListSoapOut">
+        <part name="parameters" element="s0:GetListResponse"/>
+    </message>
+    <message name="GetPreOrderPatientsListSoapIn">
+        <part name="parameters" element="s0:GetPreOrderPatientsList"/>
+    </message>
+    <message name="GetPreOrderPatientsListSoapOut">
+        <part name="parameters" element="s0:GetPreOrderPatientsListResponse"/>
+    </message>
+    <message name="SetDemographicValueSoapIn">
+        <part name="parameters" element="s0:SetDemographicValue"/>
+    </message>
+    <message name="SetDemographicValueSoapOut">
+        <part name="parameters" element="s0:SetDemographicValueResponse"/>
+    </message>
+    <portType name="wPatientsSoap">
+        <operation name="GetList">
+            <input message="s0:GetListSoapIn"/>
+            <output message="s0:GetListSoapOut"/>
+        </operation>
+        <operation name="GetPreOrderPatientsList">
+            <input message="s0:GetPreOrderPatientsListSoapIn"/>
+            <output message="s0:GetPreOrderPatientsListSoapOut"/>
+        </operation>
+        <operation name="SetDemographicValue">
+            <input message="s0:SetDemographicValueSoapIn"/>
+            <output message="s0:SetDemographicValueSoapOut"/>
+        </operation>
+    </portType>
+    <binding name="wPatientsSoap" type="s0:wPatientsSoap">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <operation name="GetList">
+            <soap:operation soapAction="http://tempuri.org/wso.ws.wPatients.GetList" style="document"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="GetPreOrderPatientsList">
+            <soap:operation soapAction="http://tempuri.org/wso.ws.wPatients.GetPreOrderPatientsList" style="document"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="SetDemographicValue">
+            <soap:operation soapAction="http://tempuri.org/wso.ws.wPatients.SetDemographicValue" style="document"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+    </binding>
+    <service name="wPatients">
+        <port name="wPatientsSoap" binding="s0:wPatientsSoap">
+            <soap:address location="http://172.16.2.221/csp/acb/wso.ws.wPatients.cls"/>
+        </port>
+    </service>
+</definitions>

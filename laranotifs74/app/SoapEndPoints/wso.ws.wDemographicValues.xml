@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:s0="http://tempuri.org" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" targetNamespace="http://tempuri.org">
+    <types>
+        <s:schema elementFormDefault="qualified" targetNamespace="http://tempuri.org">
+            <s:element name="GetList">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" name="pstrSessionKey" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrDemographicCode" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrDemographicName" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrValueCode" type="s:string"/>
+                        <s:element minOccurs="0" name="pstrDescription" type="s:string"/>
+                        <s:element minOccurs="0" name="pintStatus" type="s:string"/>
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="GetListResponse">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element name="GetListResult" type="s0:DataSet"/>
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:complexType name="DataSet">
+                <s:sequence>
+                    <s:element ref="s:schema"/>
+                    <s:any/>
+                </s:sequence>
+            </s:complexType>
+        </s:schema>
+    </types>
+    <message name="GetListSoapIn">
+        <part name="parameters" element="s0:GetList"/>
+    </message>
+    <message name="GetListSoapOut">
+        <part name="parameters" element="s0:GetListResponse"/>
+    </message>
+    <portType name="wDemographicValuesSoap">
+        <operation name="GetList">
+            <input message="s0:GetListSoapIn"/>
+            <output message="s0:GetListSoapOut"/>
+        </operation>
+    </portType>
+    <binding name="wDemographicValuesSoap" type="s0:wDemographicValuesSoap">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <operation name="GetList">
+            <soap:operation soapAction="http://tempuri.org/wso.ws.wDemographicValues.GetList" style="document"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+    </binding>
+    <service name="wDemographicValues">
+        <port name="wDemographicValuesSoap" binding="s0:wDemographicValuesSoap">
+            <soap:address location="http://172.16.2.221/csp/acb/wso.ws.wDemographicValues.cls"/>
+        </port>
+    </service>
+</definitions>
