@@ -146,6 +146,7 @@ class Ordenes
                                             "idRegla" => $regla->id,
                                             "tipoRegla" => $regla->ene ? "E" : "NE",
                                         ]+$add);
+
                                         if($add["direccion"] != 0 && $add["direccion"] != 1){
                                             array_push($this->emails, $add["direccion"]);
                                         }else if($add["direccion"] == 0 && $regla->ene == false){
@@ -170,6 +171,7 @@ class Ordenes
                                         "idRegla" => $regla->id,
                                         "tipoRegla" => $regla->ene ? "E" : "NE",
                                     ]+$add);
+                                    
                                     if($add["direccion"] != 0 && $add["direccion"] != 1){
                                         array_push($this->emails, $add["direccion"]);
                                     }else if($add["direccion"] == 0 && $regla->ene == false){
@@ -182,6 +184,9 @@ class Ordenes
                 }
             }
             $ene = false;
+        }
+        if(count($this->reglasFiltros) == 0){
+            $addmails = false;
         }
         if($addmails){
             //añadir correos usuario

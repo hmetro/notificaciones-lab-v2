@@ -184,7 +184,6 @@ class OrdenesController extends Controller
                             if(!$ordenStorage->sendNotification($resultpdf["data"], $mail)){
                                 $errores = true;
                             }
-                            dd("1 sended");
                         }
                         if($errores){
                             $saved = Storage::disk('local')->put($errorenviadas . $ordenStorage->getFileName(), $ordenStorage->toJson());

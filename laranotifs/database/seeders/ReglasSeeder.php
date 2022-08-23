@@ -55,7 +55,7 @@ class ReglasSeeder extends Seeder
             'x_especialidad' => null,
             'x_medico' => 'VACAS SALAZAR JOSE JULIAN',
             'x_idprueba' => null,
-            'add_json' => '{"direccion": "asdasf@gmaskf.com"}',
+            'add_json' => '{"direccion": "germariova@gmail.com"}',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -70,7 +70,7 @@ class ReglasSeeder extends Seeder
             'x_especialidad' => null,
             'x_medico' => null,
             'x_idprueba' => null,
-            'add_json' => null,
+            'add_json' => '{"direccion": 0}',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -85,7 +85,7 @@ class ReglasSeeder extends Seeder
             'x_especialidad' => null,
             'x_medico' => null,
             'x_idprueba' => null,
-            'add_json' => null,
+            'add_json' => '{"direccion": 0}',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
