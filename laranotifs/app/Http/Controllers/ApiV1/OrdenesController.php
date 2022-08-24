@@ -19,14 +19,18 @@ class OrdenesController extends Controller
 
             if ($ordenes["success"]) {
                 $baseDir = '1ordenes' . DIRECTORY_SEPARATOR;
+                $dayOrders = '0ordenesdia' . DIRECTORY_SEPARATOR;
                 $cont = 0;
 
                 foreach ($ordenes["data"] as $orden) {
                     $exists = Ordenes::checkFile($orden);
                     if (!$exists) {
-                        $cont++;
                         $newOrden = new Ordenes($orden);
-                        Storage::disk('local')->put($baseDir . $newOrden->getFileName(), $newOrden->toJson());
+                        $name = $newOrden->getFileName();
+                        $json = $newOrden->toJson();
+                        Storage::disk('local')->put($baseDir . $name, $json);
+                        Storage::disk('local')->put($dayOrders . $name, $json);
+                        $cont++;
                     }
                 }
 
@@ -226,6 +230,32 @@ class OrdenesController extends Controller
         }
     }
 
+    public function limpiar(){
+        try {
+            $ordenes = Ordenes::getDayOrders();
+            $cont = 0;
+
+            if(count($ordenes) != 0){
+                foreach ($ordenes as $orden) {
+                    Storage::disk('local')->delete($orden);
+                    $cont++;
+                }
+            }
+
+            return response()->json([
+                'success'   => true,
+                'message'   => $cont . ' ordenes limpiadas. :D'
+            ], 200);
+
+        } catch (\Throwable $th) {
+            dd($th);
+            return response()->json([
+                'success'   => false,
+                'message'   => 'Algo salió mal :/'
+            ], 500);
+        }
+    }
+
     public function listar(Request $request){
         $tipoOrdenes = $request->input('tipo');
         $errores = $request->input('errores');
@@ -234,6 +264,9 @@ class OrdenesController extends Controller
         $page = $request->input('page') ? $request->input('page')*1 : 1;
 
         switch ($tipoOrdenes) {
+            case 'deldia':
+                $ordenes = Ordenes::getDayOrders();
+                break;
             case 'ordenes':
                 $ordenes = Ordenes::getOrders($errores);
                 break;

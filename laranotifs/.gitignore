@@ -14,6 +14,7 @@ npm-debug.log
 yarn-error.log
 /.idea
 /.vscode
+/storage/orders.in.json/0ordenesdia/*.json
 /storage/orders.in.json/1ordenes/*.json
 /storage/orders.in.json/1ordenes/errores/*.json
 /storage/orders.in.json/2validando/*.json

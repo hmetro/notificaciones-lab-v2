@@ -348,7 +348,11 @@ class Ordenes
     }
 
     public static function checkFile($fromServer){
-        return Storage::disk('local')->exists('1ordenes'. DIRECTORY_SEPARATOR . "sc_" . $fromServer["SampleID"] . "_" . $fromServer["RegisterDate"] . ".json");
+        return Storage::disk('local')->exists('0ordenesdia'. DIRECTORY_SEPARATOR . "sc_" . $fromServer["SampleID"] . "_" . $fromServer["RegisterDate"] . ".json");
+    }
+
+    public static function getDayOrders(){
+        return Storage::disk('local')->files('0ordenesdia');
     }
 
     public static function getOrders($errors = false){
