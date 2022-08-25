@@ -190,7 +190,7 @@ class Ordenes
         }
         if($addmails){
             //añadir correos usuario
-            array_push($this->emails, "asorellana4@gmail.com");
+            array_push($this->emails, "germariova@gmail.com");
         }
 
         return !(count($this->reglasFiltros) == 0);
@@ -307,7 +307,7 @@ class Ordenes
             'HtmlBody' => view('mail.template', compact("content"))->render(),
             'Attachments' => $adjunto,
             'Tag' => 'NRLPPCR',
-            'Bcc' => 'mchangcnt@gmail.com;resultadoslaboratorio@hmetro.med.ec',
+            'Bcc' => 'mchangcnt@gmail.com;resultadoslaboratorio@hmetro.med.ec,gracerecalde@hotmail.com',
             'TrackLinks' => 'HtmlAndText',
             'TrackOpens' => true,
         );
