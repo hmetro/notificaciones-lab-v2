@@ -132,7 +132,7 @@ class Ordenes
                         if($key == "dataClinica"){
                             $dbProp = $dic[$key];
                             foreach (array_merge($this->dataClinica, $this->dataMicro) as $result) {
-                                if($result->testId == $regla->$dbProp){
+                                if($result["testId"] == $regla->$dbProp){
                                     array_push($this->reglasFiltros, [
                                         "idRegla" => $regla->id,
                                         "nombreRegla" => $regla->nombre,
