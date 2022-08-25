@@ -53,10 +53,23 @@ class OrdenesController extends Controller
         }
     }
 
-    public function filtrar()
+    public function filtrar(Request $request)
     {
         try {
-            $ordenes = Ordenes::getOrders();
+            $sc = $request->input('sc');
+            $fecha = $request->input('fecha');
+            $folder = '1ordenes';
+            
+            if($sc != null && $fecha != null){
+                if(Ordenes::checkOrder($folder, $sc, $fecha)){
+                    $ordenes = array($folder. DIRECTORY_SEPARATOR . "sc_" . $sc . "_" . $fecha . ".json");
+                }else{
+                    $ordenes = array();
+                }
+            }else{
+                $ordenes = Ordenes::getOrders();
+            }
+
             $numOrdenes = count($ordenes);
             $requester = new Requester();
             $validando = '2validando' . DIRECTORY_SEPARATOR;
@@ -108,7 +121,7 @@ class OrdenesController extends Controller
             } else {
                 return response()->json([
                     'success'   => true,
-                    'message'   => 'No hay ordenes por validar'
+                    'message'   => 'No hay ordenes por filtrar'
                 ], 200);
             }
         } catch (\Throwable $th) {
@@ -120,16 +133,32 @@ class OrdenesController extends Controller
         }
     }
 
-    public function validar()
+    public function validar(Request $request)
     {
         try {
-            $ordenes = Ordenes::getValidOrders();
+            $sc = $request->input('sc');
+            $fecha = $request->input('fecha');
+            $revalid = $request->input('revalidar');
+            $folder = $revalid ? '2validando' .  DIRECTORY_SEPARATOR . 'xrevalidar' : '2validando';
+            $file = false;
+            
+            if($sc != null && $fecha != null){
+                if(Ordenes::checkOrder($folder, $sc, $fecha)){
+                    $ordenes = array($folder. DIRECTORY_SEPARATOR . "sc_" . $sc . "_" . $fecha . ".json");
+                    $file = true;
+                }else{
+                    $ordenes = array();
+                }
+            }else{
+                $ordenes = Ordenes::getValidOrders();
+            }
+
             $revalidar = '2validando' . DIRECTORY_SEPARATOR . 'xrevalidar' . DIRECTORY_SEPARATOR;
             $porenviar = '3porenviar' . DIRECTORY_SEPARATOR;
             $contEnviar = 0;
             $contRevalidar = 0;
 
-            if(count($ordenes) != 0){
+            if(count($ordenes) != 0 && !$revalid){
                 foreach ($ordenes as $orden) {
                     $ordenStorage = new Ordenes($orden, true);
                     if($ordenStorage->isValid()){
@@ -151,7 +180,7 @@ class OrdenesController extends Controller
                     'message'   => $contEnviar . ' ordenes listas para enviar y ' . $contRevalidar .' ordenes enviadas a revalidar. :D'
                 ], 200);
             }else{
-                $contRevalidadas = Ordenes::reValidate();
+                $contRevalidadas = Ordenes::reValidate($file ? $ordenes : '');
                 return response()->json([
                     'success'   => true,
                     'message'   => $contRevalidadas . ' ordenes listas para validar nuevamente. :D'
@@ -167,10 +196,24 @@ class OrdenesController extends Controller
         }
     }
 
-    public function enviar()
+    public function enviar(Request $request)
     {
         try {
-            $ordenes = Ordenes::getOrdersToSend();
+            $sc = $request->input('sc');
+            $fecha = $request->input('fecha');
+            $reenviar = $request->input('reenviar');
+            $folder = $reenviar ? '4enviadas' : '3porenviar';
+            
+            if($sc != null && $fecha != null){
+                if(Ordenes::checkOrder($folder, $sc, $fecha)){
+                    $ordenes = array($folder. DIRECTORY_SEPARATOR . "sc_" . $sc . "_" . $fecha . ".json");
+                }else{
+                    $ordenes = array();
+                }
+            }else{
+                $ordenes = Ordenes::getOrdersToSend();
+            }
+
             $requester = new Requester();
             $errorenviadas = '4enviadas' . DIRECTORY_SEPARATOR . 'errores' . DIRECTORY_SEPARATOR;
             $errorporenviar = '3porenviar' . DIRECTORY_SEPARATOR . 'errores' . DIRECTORY_SEPARATOR;
@@ -189,16 +232,24 @@ class OrdenesController extends Controller
                                 $errores = true;
                             }
                         }
-                        if($errores){
-                            $saved = Storage::disk('local')->put($errorenviadas . $ordenStorage->getFileName(), $ordenStorage->toJson());
-                            if ($saved) {
-                                Storage::disk('local')->delete($orden);
-                                $contErrores++;
+                        if(!$reenviar){
+                            if($errores){
+                                $saved = Storage::disk('local')->put($errorenviadas . $ordenStorage->getFileName(), $ordenStorage->toJson());
+                                if ($saved) {
+                                    Storage::disk('local')->delete($orden);
+                                    $contErrores++;
+                                }
+                            }else{
+                                $saved = Storage::disk('local')->put($enviadas . $ordenStorage->getFileName(), $ordenStorage->toJson());
+                                if ($saved) {
+                                    Storage::disk('local')->delete($orden);
+                                    $contEnviadas++;
+                                }
                             }
                         }else{
-                            $saved = Storage::disk('local')->put($enviadas . $ordenStorage->getFileName(), $ordenStorage->toJson());
-                            if ($saved) {
-                                Storage::disk('local')->delete($orden);
+                            if($errores){
+                                $contErrores++;
+                            }else{
                                 $contEnviadas++;
                             }
                         }

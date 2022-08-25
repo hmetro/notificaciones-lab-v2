@@ -131,7 +131,7 @@ class Ordenes
                     if($regla->ene == $ene){
                         if($key == "dataClinica"){
                             $dbProp = $dic[$key];
-                            foreach (array_combine($this->dataClinica, $this->dataMicro) as $result) {
+                            foreach (array_merge($this->dataClinica, $this->dataMicro) as $result) {
                                 if($result->testId == $regla->$dbProp){
                                     array_push($this->reglasFiltros, [
                                         "idRegla" => $regla->id,
@@ -237,9 +237,14 @@ class Ordenes
         return json_encode(get_object_vars($this));
     }
 
-    public static function reValidate(){
+    public static function reValidate($file = ''){
         try {
-            $ordenes = Ordenes::getToRevalidateOrders();
+            if($file != ''){
+                $ordenes = $file;
+            }else{
+                $ordenes = Ordenes::getToRevalidateOrders();
+            }
+
             $numOrdenes = count($ordenes);
             $requester = new Requester();
             $validando = '2validando' . DIRECTORY_SEPARATOR;
@@ -349,6 +354,10 @@ class Ordenes
 
     public static function checkFile($fromServer){
         return Storage::disk('local')->exists('0ordenesdia'. DIRECTORY_SEPARATOR . "sc_" . $fromServer["SampleID"] . "_" . $fromServer["RegisterDate"] . ".json");
+    }
+
+    public static function checkOrder($folder, $sc, $fecha){
+        return Storage::disk('local')->exists($folder. DIRECTORY_SEPARATOR . "sc_" . $sc . "_" . $fecha . ".json");
     }
 
     public static function getDayOrders(){
