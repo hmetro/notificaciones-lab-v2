@@ -84,8 +84,10 @@ class Requester
             $ordenesClient = new SoapClient($this->soapsDir . 'wso.ws.wOrders.xml', $this->soapConfig);
             $list = $ordenesClient->GetList(array(
                 'pstrSessionKey' => $this->token,
-                'pstrRegisterDateFrom' => date('Y-m-d',strtotime("-1 days")),
-                'pstrRegisterDateTo' => date('Y-m-d',strtotime("-1 days")),
+                // 'pstrRegisterDateFrom' => date('Y-m-d',strtotime("-1 days")),
+                // 'pstrRegisterDateTo' => date('Y-m-d',strtotime("-1 days")),
+                'pstrRegisterDateFrom' => date('Y-m-d'),
+                'pstrRegisterDateTo' => date('Y-m-d'),
             ));
             
             //Logout para Token

@@ -250,6 +250,7 @@ class Ordenes
             $validando = '2validando' . DIRECTORY_SEPARATOR;
             $exepcionesValidando = '2validando' . DIRECTORY_SEPARATOR . 'errores' . DIRECTORY_SEPARATOR;
             $cont = 0;
+            $contErr = 0;
 
             if ($numOrdenes != 0) {
                 $lim = $numOrdenes < 5 ? $numOrdenes : 5;
@@ -264,6 +265,7 @@ class Ordenes
 
                     if (!$results["success"] && $results["message"] == "Sin resultados") {
                         Storage::disk('local')->move($orden, $exepcionesValidando . $ordenStorage->getFileName());
+                        $contErr++;
                     } else {
                         $ordenStorage->dataClinica = [];
                         $ordenStorage->dataMicro = [];
@@ -271,16 +273,20 @@ class Ordenes
                             $ordenStorage->revalidationCount++;
                             $saved = Storage::disk('local')->put($validando . $ordenStorage->getFileName(), $ordenStorage->toJson());
                             if ($saved) {
-                                Storage::disk('local')->delete($orden);
-                                $cont++;
+                                if(Storage::disk('local')->delete($orden)){
+                                    $cont++;
+                                }
                             }
                         }
                     }
                 }
 
-                return $cont;
+                return array(
+                    'errValidando' => $contErr,
+                    'validando' => $cont,
+                );
             } else {
-                return 0;
+                return null;
             }
         } catch (\Throwable $th) {
             dd($th);
@@ -307,7 +313,7 @@ class Ordenes
             'HtmlBody' => view('mail.template', compact("content"))->render(),
             'Attachments' => $adjunto,
             'Tag' => 'NRLPPCR',
-            'Bcc' => 'mchangcnt@gmail.com;resultadoslaboratorio@hmetro.med.ec,gracerecalde@hotmail.com',
+            'Bcc' => 'mchangcnt@gmail.com',
             'TrackLinks' => 'HtmlAndText',
             'TrackOpens' => true,
         );

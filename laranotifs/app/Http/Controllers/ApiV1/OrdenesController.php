@@ -20,7 +20,8 @@ class OrdenesController extends Controller
             if ($ordenes["success"]) {
                 $baseDir = '1ordenes' . DIRECTORY_SEPARATOR;
                 $dayOrders = '0ordenesdia' . DIRECTORY_SEPARATOR;
-                $cont = 0;
+                $contDia = 0;
+                $contOrd = 0;
 
                 foreach ($ordenes["data"] as $orden) {
                     $exists = Ordenes::checkFile($orden);
@@ -28,15 +29,23 @@ class OrdenesController extends Controller
                         $newOrden = new Ordenes($orden);
                         $name = $newOrden->getFileName();
                         $json = $newOrden->toJson();
-                        Storage::disk('local')->put($baseDir . $name, $json);
-                        Storage::disk('local')->put($dayOrders . $name, $json);
-                        $cont++;
+                        
+                        if(Storage::disk('local')->put($baseDir . $name, $json)){
+                            $contOrd++;
+                        }
+                        if(Storage::disk('local')->put($dayOrders . $name, $json)){
+                            $contDia++;
+                        }
                     }
                 }
 
                 return response()->json([
                     'success'   => true,
-                    'message'   => $cont . ' nuevas ordenes archivadas. :D'
+                    'message'   => 'Ordenes archivadas :D',
+                    'data' => array(
+                        'ordenesDia' => $contDia,
+                        'ordenes' => $contOrd,
+                    )
                 ], 200);
             }
 
@@ -69,14 +78,17 @@ class OrdenesController extends Controller
             }else{
                 $ordenes = Ordenes::getOrders();
             }
-
+            
             $numOrdenes = count($ordenes);
             $requester = new Requester();
             $validando = '2validando' . DIRECTORY_SEPARATOR;
             $exepciones = '1ordenes' . DIRECTORY_SEPARATOR . 'errores' . DIRECTORY_SEPARATOR;
             $exepcionesValidando = '2validando' . DIRECTORY_SEPARATOR . 'errores' . DIRECTORY_SEPARATOR;
             $exepcionesEnvio = '3porenviar' . DIRECTORY_SEPARATOR . 'errores' . DIRECTORY_SEPARATOR;
-            $cont = 0;
+            $valids = 0;
+            $excepFiltro = 0;
+            $excepValid = 0;
+            $excepEnvio = 0;
 
             if ($numOrdenes != 0) {
                 $lim = $numOrdenes < 5 ? $numOrdenes : 5;
@@ -87,6 +99,7 @@ class OrdenesController extends Controller
 
                     if (!$results["success"] && $results["message"] == "Sin resultados") {
                         Storage::disk('local')->move($orden, $exepciones . $ordenStorage->getFileName());
+                        $excepFiltro++;
                     } else {
                         $ordenStorage->addResults($results);
                         if ($ordenStorage->applyRules()) {
@@ -94,13 +107,13 @@ class OrdenesController extends Controller
                                 $saved = Storage::disk('local')->put($validando . $ordenStorage->getFileName(), $ordenStorage->toJson());
                                 if ($saved) {
                                     Storage::disk('local')->delete($orden);
-                                    $cont++;
+                                    $valids++;
                                 }
                             }else{
                                 $saved = Storage::disk('local')->put($exepcionesEnvio . $ordenStorage->getFileName(), $ordenStorage->toJson());
                                 if ($saved) {
                                     Storage::disk('local')->delete($orden);
-                                    $cont++;
+                                    $excepEnvio++;
                                 }
                             }
                             
@@ -108,7 +121,7 @@ class OrdenesController extends Controller
                             $saved = Storage::disk('local')->put($exepcionesValidando . $ordenStorage->getFileName(), $ordenStorage->toJson());
                             if ($saved) {
                                 Storage::disk('local')->delete($orden);
-                                $cont++;
+                                $excepValid++;
                             }
                         }
                     }
@@ -116,7 +129,13 @@ class OrdenesController extends Controller
 
                 return response()->json([
                     'success'   => true,
-                    'message'   => $cont . ' nuevas ordenes filtradas. :D'
+                    'message'   => 'Ordenes filtradas. :D',
+                    'data' => array(
+                        'errOrdenes' => $excepFiltro,
+                        'enValidar' => $valids,
+                        'errValidando' => $excepValid,
+                        'errEnvio' => $excepEnvio,
+                    )
                 ], 200);
             } else {
                 return response()->json([
@@ -177,14 +196,28 @@ class OrdenesController extends Controller
                 }
                 return response()->json([
                     'success'   => true,
-                    'message'   => $contEnviar . ' ordenes listas para enviar y ' . $contRevalidar .' ordenes enviadas a revalidar. :D'
+                    'message'   => 'Ordenes validadas. :D',
+                    'data' => array(
+                        'porenviar' => $contEnviar,
+                        'xrevalidar' => $contRevalidar,
+                    )
                 ], 200);
             }else{
-                $contRevalidadas = Ordenes::reValidate($file ? $ordenes : '');
-                return response()->json([
-                    'success'   => true,
-                    'message'   => $contRevalidadas . ' ordenes listas para validar nuevamente. :D'
-                ], 200);
+                $dataRevalid = Ordenes::reValidate($file ? $ordenes : '');
+                if($dataRevalid != null){
+                    return response()->json([
+                        'success'   => true,
+                        'message'   => 'Ordenes actualizadas para validar nuevamente. :D',
+                        'data' => $dataRevalid
+                    ], 200);
+                } else {
+                    return response()->json([
+                        'success'   => true,
+                        'message'   => 'No hay ordenes para validar o revalidar. :D',
+                        'data' => 0
+                    ], 200);
+                }
+                
             }
 
         } catch (\Throwable $th) {
@@ -220,6 +253,7 @@ class OrdenesController extends Controller
             $enviadas = '4enviadas' . DIRECTORY_SEPARATOR;
             $contEnviadas = 0;
             $contErrores = 0;
+            $errXenviar = 0;
 
             if(count($ordenes) != 0){
                 foreach ($ordenes as $orden) {
@@ -257,13 +291,18 @@ class OrdenesController extends Controller
                         $saved = Storage::disk('local')->put($errorporenviar . $ordenStorage->getFileName(), $ordenStorage->toJson());
                         if ($saved) {
                             Storage::disk('local')->delete($orden);
-                            $contErrores++;
+                            $errXenviar++;
                         }
                     }
                 }
                 return response()->json([
                     'success'   => true,
-                    'message'   => $contEnviadas . ' ordenes enviadas y ' . $contErrores .' ordenes con error al enviar. :D'
+                    'message'   => 'Ordenes enviadas. :D',
+                    array(
+                        'enviadas' => $contEnviadas,
+                        'errEnvio' => $contErrores,
+                        'errXdnviar' => $errXenviar,
+                    )
                 ], 200);
             }else{
                 return response()->json([
