@@ -295,7 +295,6 @@ class OrdenesController extends Controller
             $errorenviadas = '4enviadas' . DIRECTORY_SEPARATOR . 'errores' . DIRECTORY_SEPARATOR;
             $errorporenviar = '3porenviar' . DIRECTORY_SEPARATOR . 'errores' . DIRECTORY_SEPARATOR;
             $enviadas = '4enviadas' . DIRECTORY_SEPARATOR;
-            $ocr = 'pcr' . DIRECTORY_SEPARATOR;
             $contEnviadas = 0;
             $contErrores = 0;
             $errXenviar = 0;
