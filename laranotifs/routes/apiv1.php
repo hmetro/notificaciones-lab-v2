@@ -30,4 +30,6 @@ Route::get('limpiar/ordenes', [OrdenesController::class, 'limpiar']);
 
 Route::get('listar/ordenes', [OrdenesController::class, 'listar']);
 
+Route::get('buscar/ordenes', [OrdenesController::class, 'fileInfo']);
+
 Route::get('status', [ApiV1Controller::class, 'isWorking']);

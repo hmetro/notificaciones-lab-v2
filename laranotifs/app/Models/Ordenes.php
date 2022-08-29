@@ -247,6 +247,7 @@ class Ordenes
 
             $numOrdenes = count($ordenes);
             $requester = new Requester();
+            $dayOrders = '0ordenesdia' . DIRECTORY_SEPARATOR;
             $validando = '2validando' . DIRECTORY_SEPARATOR;
             $exepcionesValidando = '2validando' . DIRECTORY_SEPARATOR . 'errores' . DIRECTORY_SEPARATOR;
             $cont = 0;
@@ -257,6 +258,8 @@ class Ordenes
                 for ($i = 0; $i < $lim; $i++) {
                     $orden = $ordenes[$i];
                     $ordenStorage = new Ordenes($orden, true);
+                    $name = $ordenStorage->getFileName();
+
                     if($ordenStorage->validacionClinica == 0 && $ordenStorage->validacionMicro == 0){
                         $results = $requester->getOrderResults($ordenStorage);
                     }else{
@@ -264,14 +267,24 @@ class Ordenes
                     }
 
                     if (!$results["success"] && $results["message"] == "Sin resultados") {
-                        Storage::disk('local')->move($orden, $exepcionesValidando . $ordenStorage->getFileName());
+                        Storage::disk('local')->move($orden, $exepcionesValidando . $name);
+                        Storage::disk('local')->put($dayOrders . $name, json_encode(array(
+                            'errors' => 1,
+                            'where' => 'validando',
+                            'path' => './2validando/errores/' . $name
+                        )));
                         $contErr++;
                     } else {
                         $ordenStorage->dataClinica = [];
                         $ordenStorage->dataMicro = [];
                         if ($ordenStorage->addResults($results)) {
                             $ordenStorage->revalidationCount++;
-                            $saved = Storage::disk('local')->put($validando . $ordenStorage->getFileName(), $ordenStorage->toJson());
+                            $saved = Storage::disk('local')->put($validando . $name, $ordenStorage->toJson());
+                            Storage::disk('local')->put($dayOrders . $name, json_encode(array(
+                                'errors' => 0,
+                                'where' => 'validando',
+                                'path' => './2validando/' . $name
+                            )));
                             if ($saved) {
                                 if(Storage::disk('local')->delete($orden)){
                                     $cont++;

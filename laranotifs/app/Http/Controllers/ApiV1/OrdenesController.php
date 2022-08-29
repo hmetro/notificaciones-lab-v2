@@ -28,12 +28,15 @@ class OrdenesController extends Controller
                     if (!$exists) {
                         $newOrden = new Ordenes($orden);
                         $name = $newOrden->getFileName();
-                        $json = $newOrden->toJson();
                         
-                        if(Storage::disk('local')->put($baseDir . $name, $json)){
+                        if(Storage::disk('local')->put($baseDir . $name, $newOrden->toJson())){
                             $contOrd++;
                         }
-                        if(Storage::disk('local')->put($dayOrders . $name, $json)){
+                        if(Storage::disk('local')->put($dayOrders . $name, json_encode(array(
+                            'errors' => 0,
+                            'where' => 'ordenes',
+                            'path' => './1ordenes/' . $name
+                        )))){
                             $contDia++;
                         }
                     }
@@ -81,6 +84,7 @@ class OrdenesController extends Controller
             
             $numOrdenes = count($ordenes);
             $requester = new Requester();
+            $dayOrders = '0ordenesdia' . DIRECTORY_SEPARATOR;
             $validando = '2validando' . DIRECTORY_SEPARATOR;
             $exepciones = '1ordenes' . DIRECTORY_SEPARATOR . 'errores' . DIRECTORY_SEPARATOR;
             $exepcionesValidando = '2validando' . DIRECTORY_SEPARATOR . 'errores' . DIRECTORY_SEPARATOR;
@@ -96,21 +100,37 @@ class OrdenesController extends Controller
                     $orden = $ordenes[$i];
                     $ordenStorage = new Ordenes($orden, true);
                     $results = $requester->getOrderResults($ordenStorage);
+                    $name = $ordenStorage->getFileName();
 
                     if (!$results["success"] && $results["message"] == "Sin resultados") {
-                        Storage::disk('local')->move($orden, $exepciones . $ordenStorage->getFileName());
+                        Storage::disk('local')->move($orden, $exepciones . $name);
+                        Storage::disk('local')->put($dayOrders . $name, json_encode(array(
+                            'errors' => 1,
+                            'where' => 'ordenes',
+                            'path' => './1ordenes/errores/' . $name
+                        )));
                         $excepFiltro++;
                     } else {
                         $ordenStorage->addResults($results);
                         if ($ordenStorage->applyRules()) {
                             if (count($ordenStorage->emails) > 0) {
-                                $saved = Storage::disk('local')->put($validando . $ordenStorage->getFileName(), $ordenStorage->toJson());
+                                $saved = Storage::disk('local')->put($validando . $name, $ordenStorage->toJson());
+                                Storage::disk('local')->put($dayOrders . $name, json_encode(array(
+                                    'errors' => 0,
+                                    'where' => 'validando',
+                                    'path' => './2validando/' . $name
+                                )));
                                 if ($saved) {
                                     Storage::disk('local')->delete($orden);
                                     $valids++;
                                 }
                             }else{
-                                $saved = Storage::disk('local')->put($exepcionesEnvio . $ordenStorage->getFileName(), $ordenStorage->toJson());
+                                $saved = Storage::disk('local')->put($exepcionesEnvio . $name, $ordenStorage->toJson());
+                                Storage::disk('local')->put($dayOrders . $name, json_encode(array(
+                                    'errors' => 1,
+                                    'where' => 'porenviar',
+                                    'path' => './3porenviar/errores/' . $name
+                                )));
                                 if ($saved) {
                                     Storage::disk('local')->delete($orden);
                                     $excepEnvio++;
@@ -118,7 +138,12 @@ class OrdenesController extends Controller
                             }
                             
                         } else {
-                            $saved = Storage::disk('local')->put($exepcionesValidando . $ordenStorage->getFileName(), $ordenStorage->toJson());
+                            $saved = Storage::disk('local')->put($exepcionesValidando . $name, $ordenStorage->toJson());
+                            Storage::disk('local')->put($dayOrders . $name, json_encode(array(
+                                'errors' => 1,
+                                'where' => 'validando',
+                                'path' => './2validando/errores/' . $name
+                            )));
                             if ($saved) {
                                 Storage::disk('local')->delete($orden);
                                 $excepValid++;
@@ -172,6 +197,7 @@ class OrdenesController extends Controller
                 $ordenes = Ordenes::getValidOrders();
             }
 
+            $dayOrders = '0ordenesdia' . DIRECTORY_SEPARATOR;
             $revalidar = '2validando' . DIRECTORY_SEPARATOR . 'xrevalidar' . DIRECTORY_SEPARATOR;
             $porenviar = '3porenviar' . DIRECTORY_SEPARATOR;
             $contEnviar = 0;
@@ -180,14 +206,26 @@ class OrdenesController extends Controller
             if(count($ordenes) != 0 && !$revalid){
                 foreach ($ordenes as $orden) {
                     $ordenStorage = new Ordenes($orden, true);
+                    $name = $ordenStorage->getFileName();
+
                     if($ordenStorage->isValid()){
-                        $saved = Storage::disk('local')->put($porenviar . $ordenStorage->getFileName(), $ordenStorage->toJson());
+                        $saved = Storage::disk('local')->put($porenviar . $name, $ordenStorage->toJson());
+                        Storage::disk('local')->put($dayOrders . $name, json_encode(array(
+                            'errors' => 0,
+                            'where' => 'porenviar',
+                            'path' => './3porenvair/' . $name
+                        )));
                         if ($saved) {
                             Storage::disk('local')->delete($orden);
                             $contEnviar++;
                         }
                     }else{
-                        $saved = Storage::disk('local')->put($revalidar . $ordenStorage->getFileName(), $ordenStorage->toJson());
+                        $saved = Storage::disk('local')->put($revalidar . $name, $ordenStorage->toJson());
+                        Storage::disk('local')->put($dayOrders . $name, json_encode(array(
+                            'errors' => 0,
+                            'where' => 'revalidando',
+                            'path' => './2validando/xrevalidar/' . $name
+                        )));
                         if ($saved) {
                             Storage::disk('local')->delete($orden);
                             $contRevalidar++;
@@ -248,6 +286,7 @@ class OrdenesController extends Controller
             }
 
             $requester = new Requester();
+            $dayOrders = '0ordenesdia' . DIRECTORY_SEPARATOR;
             $errorenviadas = '4enviadas' . DIRECTORY_SEPARATOR . 'errores' . DIRECTORY_SEPARATOR;
             $errorporenviar = '3porenviar' . DIRECTORY_SEPARATOR . 'errores' . DIRECTORY_SEPARATOR;
             $enviadas = '4enviadas' . DIRECTORY_SEPARATOR;
@@ -259,6 +298,8 @@ class OrdenesController extends Controller
                 foreach ($ordenes as $orden) {
                     $ordenStorage = new Ordenes($orden, true);
                     $resultpdf = $requester->fetchPDF($ordenStorage);
+                    $name = $ordenStorage->getFileName();
+
                     if($resultpdf["success"] == true){
                         $errores = false;
                         foreach ($ordenStorage->emails as $mail) {
@@ -268,13 +309,23 @@ class OrdenesController extends Controller
                         }
                         if(!$reenviar){
                             if($errores){
-                                $saved = Storage::disk('local')->put($errorenviadas . $ordenStorage->getFileName(), $ordenStorage->toJson());
+                                $saved = Storage::disk('local')->put($errorenviadas . $name, $ordenStorage->toJson());
+                                Storage::disk('local')->put($dayOrders . $name, json_encode(array(
+                                    'errors' => 1,
+                                    'where' => 'enviadas',
+                                    'path' => './4enviadas/errores/' . $name
+                                )));
                                 if ($saved) {
                                     Storage::disk('local')->delete($orden);
                                     $contErrores++;
                                 }
                             }else{
-                                $saved = Storage::disk('local')->put($enviadas . $ordenStorage->getFileName(), $ordenStorage->toJson());
+                                $saved = Storage::disk('local')->put($enviadas . $name, $ordenStorage->toJson());
+                                Storage::disk('local')->put($dayOrders . $name, json_encode(array(
+                                    'errors' => 0,
+                                    'where' => 'enviadas',
+                                    'path' => './4enviadas/' . $name
+                                )));
                                 if ($saved) {
                                     Storage::disk('local')->delete($orden);
                                     $contEnviadas++;
@@ -288,7 +339,12 @@ class OrdenesController extends Controller
                             }
                         }
                     }else{
-                        $saved = Storage::disk('local')->put($errorporenviar . $ordenStorage->getFileName(), $ordenStorage->toJson());
+                        $saved = Storage::disk('local')->put($errorporenviar . $name, $ordenStorage->toJson());
+                        Storage::disk('local')->put($dayOrders . $name, json_encode(array(
+                            'errors' => 1,
+                            'where' => 'porenviar',
+                            'path' => './3porenviar/errores/' . $name
+                        )));
                         if ($saved) {
                             Storage::disk('local')->delete($orden);
                             $errXenviar++;
@@ -298,7 +354,7 @@ class OrdenesController extends Controller
                 return response()->json([
                     'success'   => true,
                     'message'   => 'Ordenes enviadas. :D',
-                    array(
+                    'data' => array(
                         'enviadas' => $contEnviadas,
                         'errEnvio' => $contErrores,
                         'errXdnviar' => $errXenviar,
@@ -337,6 +393,43 @@ class OrdenesController extends Controller
                 'message'   => $cont . ' ordenes limpiadas. :D'
             ], 200);
 
+        } catch (\Throwable $th) {
+            dd($th);
+            return response()->json([
+                'success'   => false,
+                'message'   => 'Algo salió mal :/'
+            ], 500);
+        }
+    }
+
+    public function fileInfo(Request $request){
+        try {
+            $sc = $request->input('sc');
+            $fecha = $request->input('fecha');
+            $folder = '0ordenesdia' .  DIRECTORY_SEPARATOR;
+            
+            if($sc != null && $fecha != null){
+                $name = $folder. DIRECTORY_SEPARATOR . "sc_" . $sc . "_" . $fecha . ".json";
+
+                if(Ordenes::checkOrder($folder, $sc, $fecha)){;
+                    $ordenStorage = new Ordenes($name, true);
+                    return response()->json([
+                        'success'   => true,
+                        'message'   => 'Datos orden',
+                        'data' => get_object_vars($ordenStorage)
+                    ], 200);
+                }else{
+                    return response()->json([
+                        'success'   => true,
+                        'message'   => 'Orden no encontrada'
+                    ], 404);
+                }
+            }else{
+                return response()->json([
+                    'success'   => true,
+                    'message'   => 'Debes enviar el sc y la fecha'
+                ], 400);
+            }
         } catch (\Throwable $th) {
             dd($th);
             return response()->json([
