@@ -213,7 +213,7 @@ class OrdenesController extends Controller
                         Storage::disk('local')->put($dayOrders . $name, json_encode(array(
                             'errors' => 0,
                             'where' => 'porenviar',
-                            'path' => './3porenvair/' . $name
+                            'path' => './3porenviar/' . $name
                         )));
                         if ($saved) {
                             Storage::disk('local')->delete($orden);
@@ -297,7 +297,16 @@ class OrdenesController extends Controller
             if(count($ordenes) != 0){
                 foreach ($ordenes as $orden) {
                     $ordenStorage = new Ordenes($orden, true);
-                    $resultpdf = $requester->fetchPDF($ordenStorage);
+
+                    if($ordenStorage->isPCR()){
+                        Storage::disk('public')->put('pcr' . DIRECTORY_SEPARATOR . 'hola.txt', "hola");
+                        dd("hola");
+
+                        $resultpdf = $requester->fetchPDF($ordenStorage);
+                    }else{
+                        $resultpdf = $requester->fetchPDF($ordenStorage);
+                    }
+
                     $name = $ordenStorage->getFileName();
 
                     if($resultpdf["success"] == true){

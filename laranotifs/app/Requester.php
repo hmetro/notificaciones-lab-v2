@@ -4,6 +4,8 @@ namespace App;
 
 use SoapClient;
 use SoapFault;
+use DateTime;
+use DateTimeZone;
 use App\Models\Ordenes;
 
 class Requester
@@ -78,16 +80,16 @@ class Requester
         try {
 
             //Login para Token
+
             $this->login();
+            $date = new DateTime("now", new DateTimeZone('America/Lima'));
 
             //Nuevo cliente wOrders y traigo resultados
             $ordenesClient = new SoapClient($this->soapsDir . 'wso.ws.wOrders.xml', $this->soapConfig);
             $list = $ordenesClient->GetList(array(
                 'pstrSessionKey' => $this->token,
-                // 'pstrRegisterDateFrom' => date('Y-m-d',strtotime("-1 days")),
-                // 'pstrRegisterDateTo' => date('Y-m-d',strtotime("-1 days")),
-                'pstrRegisterDateFrom' => date('Y-m-d'),
-                'pstrRegisterDateTo' => date('Y-m-d'),
+                'pstrRegisterDateFrom' => $date->format('Y-m-d'),
+                'pstrRegisterDateTo' => $date->format('Y-m-d')
             ));
             
             //Logout para Token

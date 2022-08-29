@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Support\Facades\Storage;
 use App\Requester;
+use DateTime;
+use DateTimeZone;
 
 class Ordenes
 {
@@ -133,11 +135,13 @@ class Ordenes
                             $dbProp = $dic[$key];
                             foreach (array_merge($this->dataClinica, $this->dataMicro) as $result) {
                                 if($result["testId"] == $regla->$dbProp){
+                                    $date = new DateTime("now", new DateTimeZone('America/Lima'));
+
                                     array_push($this->reglasFiltros, [
                                         "idRegla" => $regla->id,
                                         "nombreRegla" => $regla->nombre,
                                         "tipoRegla" => $regla->ene ? "E" : "NE",
-                                        "aplicada" => date("Y-m-d e h:i:s"),
+                                        "aplicada" => $date->format("Y-m-d e H:i:s"),
                                     ]);
     
                                     if($regla->add_json != null){
@@ -158,11 +162,13 @@ class Ordenes
                         }else{
                             $dbProp = $dic[$key];
                             if($this->$key == $regla->$dbProp){
+                                $date = new DateTime("now", new DateTimeZone('America/Lima'));
+
                                 array_push($this->reglasFiltros, [
                                     "idRegla" => $regla->id,
                                     "nombreRegla" => $regla->nombre,
                                     "tipoRegla" => $regla->ene ? "E" : "NE",
-                                    "aplicada" => date("Y-m-d e h:i:s"),
+                                    "aplicada" => $date->format("Y-m-d e H:i:s"),
                                 ]);
 
                                 if($regla->add_json != null){
@@ -196,12 +202,18 @@ class Ordenes
         return !(count($this->reglasFiltros) == 0);
     }
 
+    public function isPCR(){
+        return false;
+    }
+
     public function isValid(){
         $validC = true;
 
         if($this->validacionClinica == 0){
             foreach ($this->dataClinica as $res) {
-                $res->lastVerified = date("Y-m-d e h:i:s");
+                $date = new DateTime("now", new DateTimeZone('America/Lima'));
+
+                $res->lastVerified = $date->format("Y-m-d e H:i:s");
                 if($res->testStatus < 4 ){
                     $validC = false;
                 }
@@ -216,7 +228,9 @@ class Ordenes
 
         if($this->validacionMicro == 0){
             foreach ($this->dataMicro as $res) {
-                $res->lastVerified = date("Y-m-d e h:i:s");
+                $date = new DateTime("now", new DateTimeZone('America/Lima'));
+
+                $res->lastVerified = $date->format("Y-m-d e H:i:s");
                 if($res->testStatus < 4 ){
                     $validM = false;
                 }
