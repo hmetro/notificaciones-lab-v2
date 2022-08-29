@@ -143,6 +143,7 @@ class Requester
                 $return = array('success' => true, 'data' => [
                     'results' => isset($results->GetResultsResult) ? $results->GetResultsResult->Orders->LISOrder->LabTests->LISLabTest : false,
                     'microResults' => isset($microResults->GetMicroResultsResult) ? $microResults->GetMicroResultsResult->Orders->LISOrder->MicSpecs->LISMicSpec : false,
+                    'pcrUser' => $this->onRetry
                 ]);
 
                 //Retorno datos

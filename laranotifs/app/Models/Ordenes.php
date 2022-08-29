@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Requester;
 use DateTime;
 use DateTimeZone;
+use phpDocumentor\Reflection\PseudoTypes\True_;
 
 class Ordenes
 {
@@ -23,6 +24,7 @@ class Ordenes
     public int $validacionClinica;
     public int $validacionMicro;
     public int $revalidationCount;
+    public int $isPcr;
     public array $reglasFiltros;
     public array $dataEnvio;
     public array $logsEnvio;
@@ -32,6 +34,7 @@ class Ordenes
 
     public function addResults($results){
         try {
+            $this->isPcr = $results["data"]["pcrUser"];
             if($results["data"]["results"] != false && !isset($results["data"]["results"]->TestID)){
                 foreach ($results["data"]["results"] as $result) {
                     
@@ -203,7 +206,7 @@ class Ordenes
     }
 
     public function isPCR(){
-        return false;
+        return $this->isPcr == 1 ? true : false;
     }
 
     public function isValid(){
@@ -443,6 +446,7 @@ class Ordenes
             $this->validacionClinica = -1;
             $this->validacionMicro = -1;
             $this->revalidationCount = 0;
+            $this->isPCR = 0;
             $this->reglasFiltros = [];
             $this->dataEnvio = [];
             $this->logsEnvio = [];

@@ -7,6 +7,11 @@ use App\Requester;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Ordenes;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\URL;
+use Endroid\QrCode\Builder\Builder;
+use Endroid\QrCode\Writer\PngWriter;
+use Endroid\QrCode\Encoding\Encoding;
+use setasign\Fpdi\Fpdi;
 
 class OrdenesController extends Controller
 {
@@ -290,6 +295,7 @@ class OrdenesController extends Controller
             $errorenviadas = '4enviadas' . DIRECTORY_SEPARATOR . 'errores' . DIRECTORY_SEPARATOR;
             $errorporenviar = '3porenviar' . DIRECTORY_SEPARATOR . 'errores' . DIRECTORY_SEPARATOR;
             $enviadas = '4enviadas' . DIRECTORY_SEPARATOR;
+            $ocr = 'pcr' . DIRECTORY_SEPARATOR;
             $contEnviadas = 0;
             $contErrores = 0;
             $errXenviar = 0;
@@ -297,12 +303,74 @@ class OrdenesController extends Controller
             if(count($ordenes) != 0){
                 foreach ($ordenes as $orden) {
                     $ordenStorage = new Ordenes($orden, true);
+                    $resultpdf = array(
+                        'success' => false,
+                    );
 
                     if($ordenStorage->isPCR()){
-                        Storage::disk('public')->put('pcr' . DIRECTORY_SEPARATOR . 'hola.txt', "hola");
-                        dd("hola");
+                        $firstPdf = $requester->fetchPDF($ordenStorage);
+                        if($firstPdf["success"] == true){
+                            $url = $firstPdf["data"];
+                            $fileName = $ordenStorage->sc . '.pdf';
+                            $qrName = $ordenStorage->sc . '.png';
+                            Storage::disk('public')->put('pcr' . DIRECTORY_SEPARATOR . $fileName, file_get_contents($url));
+                            $fullUrl = URL::to('/storage/pcr/' . $fileName);
+                            $dir = public_path() . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . 'pcr' . DIRECTORY_SEPARATOR . $fileName;
+                            $qrCode = Builder::create()
+                                ->writer(new PngWriter())
+                                ->writerOptions([])
+                                ->data($fullUrl)
+                                ->encoding(new Encoding('UTF-8'))
+                                ->logoPath(__DIR__ . DIRECTORY_SEPARATOR . 'hm.png')
+                                ->build();
+                            Storage::disk('public')->put('pcr' . DIRECTORY_SEPARATOR . 'qrs' . DIRECTORY_SEPARATOR . $qrName, $qrCode->getString());
 
-                        $resultpdf = $requester->fetchPDF($ordenStorage);
+                            $dirQr = public_path() . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . 'pcr' . DIRECTORY_SEPARATOR . 'qrs' . DIRECTORY_SEPARATOR . $qrName;
+
+                            $pdf = new Fpdi();
+                            $staticIds = array();
+                            $pageCount = $pdf->setSourceFile($dir);
+
+                            for ($pageNumber = 1; $pageNumber <= $pageCount; $pageNumber++) {
+                                $staticIds[$pageNumber] = $pdf->importPage($pageNumber);
+                            }
+                
+                            // get the page count of the uploaded file
+                            $pageCount = $pdf->setSourceFile($dir);
+                
+                            // let's track the page number for the filler page
+                            $fillerPageCount = 1;
+                            // import the uploaded document page by page
+                            for ($pageNumber = 1; $pageNumber <= $pageCount; $pageNumber++) {
+                
+                                if ($fillerPageCount == 1) {
+                                    // add the current filler page
+                                    $pdf->AddPage();
+                                    $pdf->useTemplate($staticIds[$fillerPageCount]);
+                                    $pdf->Image($dirQr, 5, 237, 40, 40);
+                                    // QR ACESS
+                                    // $pdf->Image($qrAcess, 46, 237.1, 40, 39);
+                                }
+                
+                                // update the filler page number or reset it
+                                $fillerPageCount++;
+                                if ($fillerPageCount > count($staticIds)) {
+                                    $fillerPageCount = 1;
+                                }
+                            }
+                
+                            Storage::disk('public')->put('pcr' . DIRECTORY_SEPARATOR . $fileName, $pdf->Output('S'));
+                            
+                            $resultpdf = array(
+                                'success' => true,
+                                'data' => $fullUrl,
+                            );
+                        }else{
+                            return response()->json([
+                                'success'   => false,
+                                'message'   => 'No hay el resultado de la orden :/'
+                            ], 200);
+                        }
                     }else{
                         $resultpdf = $requester->fetchPDF($ordenStorage);
                     }
