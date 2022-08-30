@@ -433,7 +433,7 @@ class OrdenesController extends Controller
                     'data' => array(
                         'enviadas' => $contEnviadas,
                         'errEnvio' => $contErrores,
-                        'errXdnviar' => $errXenviar,
+                        'errXenviar' => $errXenviar,
                     )
                 ], 200);
             }else{

@@ -446,7 +446,7 @@ class Ordenes
             $this->validacionClinica = -1;
             $this->validacionMicro = -1;
             $this->revalidationCount = 0;
-            $this->isPCR = 0;
+            $this->isPcr = 0;
             $this->reglasFiltros = [];
             $this->dataEnvio = [];
             $this->logsEnvio = [];
